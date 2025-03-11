@@ -3,7 +3,7 @@
  * @author ChrisFloofyKitsune <chrisfloofykitsune@gmail.com>
  * @license GPL-2.0
  */
-const {PREC, c_rules, commaSep1, preprocIf} = require("./c_grammar");
+const {PREC, c_rules, commaSep1, preprocIf, commaSep} = require("./c_grammar");
 
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
@@ -17,11 +17,11 @@ function kw(keyword, ...rules) {
 
         // pass already labeled fields through
         if (rule.type === 'FIELD') {
-            return prec(1, token(rule));
+            return prec(1, rule);
         }
 
         // otherwise, mark as argument
-        return field(`arg`, rule);
+        return field(`argument`, rule);
     });
 
     return prec(PREC.CALL + 1, seq(
@@ -49,6 +49,7 @@ module.exports = grammar({
 
     inline: $ => [
         $._expression_not_binary,
+        $.speed_or_now,
     ],
 
     supertypes: $ => [
@@ -112,7 +113,7 @@ module.exports = grammar({
         )),
 
         static_var_declaration: $ => prec(10, seq(
-            /static-var/i,
+            /static-?var/i,
             commaSep1(field('name', $.identifier)),
             ';'
         )),
@@ -183,8 +184,8 @@ module.exports = grammar({
         ),
 
         keyword_statement: $ => prec.left(11, choice(
-            $.call_statement,
-            $.start_statement,
+            $.call_script_statement,
+            $.start_script_statement,
 
             $.signal_statement,
             $.set_signal_mask_statement,
@@ -223,15 +224,17 @@ module.exports = grammar({
             /x-?axis/i, /y-?axis/i, /z-?axis/i
         ),
 
-        expression_list: $ => commaSep1($.expression),
-
-        call_statement: $ => choice(
-            kw(/call-?script/i, $.identifier, '()'),
-            kw(/call-?script/i, $.identifier, '(', $.expression_list, ')')
+        argument_list: $ => seq(
+            '(',
+            commaSep($.expression),
+            ')',
         ),
-        start_statement: $ => choice(
-            kw(/start-?script/i, $.identifier, '()'),
-            kw(/start-?script/i, $.identifier, '(', $.expression_list, ')'),
+
+        call_script_statement: $ => choice(
+            kw(/call-?script/i, field('function', $.identifier), field('arguments', $.argument_list))
+        ),
+        start_script_statement: $ => choice(
+            kw(/start-?script/i, field('function', $.identifier), field('arguments', $.argument_list)),
         ),
         signal_statement: $ => kw(/signal/i, $.expression),
 
@@ -240,38 +243,39 @@ module.exports = grammar({
 
         set_statement: $ => kw(/set/i, $.expression, /to/i, $.expression),
 
-        get_statement: $ => kw(/get/i, $.get_call),
+        get_statement: $ => kw(/get/i, field('call', $.get_call)),
         spin_statement: $ => kw(
-            /spin/i, $.identifier, /around/i, $.axis, /speed/i, $.expression,
+            /spin/i, field('piece', $.identifier), /around/i, field('axis', $.axis), /speed/i, $.expression,
             optional(seq(/accelerate/i, $.expression))
         ),
 
         stop_spin_statement: $ => kw(
-            /stop-?spin/i, $.identifier, /around/i, $.axis,
+            /stop-?spin/i, field('piece', $.identifier), /around/i, field('axis', $.axis),
             optional(seq(/decelerate/i, $.expression))
         ),
         speed_or_now: $ => choice(/now/i, seq(/speed/i, $.expression)),
 
-        turn_statement: $ => kw(/turn/i, $.identifier, /to/i, $.axis, $.expression, $.speed_or_now),
-        move_statement: $ => kw(/move/i, $.identifier, /to/i, $.axis, $.expression, $.speed_or_now),
-        wait_for_turn_statement: $ => kw(/wait-?for-?turn/i, $.identifier, /around/i, $.axis,),
+        turn_statement: $ => kw(/turn/i, field('piece', $.identifier), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
+        move_statement: $ => kw(/move/i, field('piece', $.identifier), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
+        wait_for_turn_statement: $ => kw(/wait-?for-?turn/i, field('piece', $.identifier), /around/i, field('axis', $.axis),),
 
-        wait_for_move_statement: $ => kw(/wait-?for-?move/i, $.identifier, /along/i, $.axis,),
-        hide_statement: $ => kw(/hide/i, $.identifier),
+        wait_for_move_statement: $ => kw(/wait-?for-?move/i, field('piece', $.identifier), /along/i, field('axis', $.axis),),
+        hide_statement: $ => kw(/hide/i, field('piece', $.identifier)),
 
-        show_statement: $ => kw(/show/i, $.identifier),
-        emit_sfx_statement: $ => kw(/emit-?sfx/i, $.expression, /from/i, $.identifier),
+        show_statement: $ => kw(/show/i, field('piece', $.identifier)),
+        emit_sfx_statement: $ => kw(/emit-?sfx/i, $.expression, /from/i, field('piece', $.identifier)),
 
         // play_sound_statement: $ => undefined,
-        explode_statement: $ => kw(/explode/i, $.identifier, /type/i, $.expression),
+        explode_statement: $ => kw(/explode/i, field('piece', $.identifier), /type/i, $.expression),
+
         attach_unit_statement: $ => kw(/attach-?unit/i, $.expression, /to/i, $.expression),
-
         drop_unit_statement: $ => kw(/drop-?unit/i, $.expression),
-        cache_statement: $ => kw(/cache/i, $.identifier),
 
-        dont_cache_statement: $ => kw(/dont-?cache/i, $.identifier),
-        dont_shadow_statement: $ => kw(/dont-?shadow/i, $.identifier),
-        dont_shade_statement: $ => kw(/dont-?shade/i, $.identifier),
+        cache_statement: $ => kw(/cache/i, field('piece', $.identifier)),
+        dont_cache_statement: $ => kw(/dont-?cache/i, field('piece', $.identifier)),
+        shade_statement: $ => kw(/shade/i, field('piece', $.identifier)),
+        dont_shade_statement: $ => kw(/dont-?shade/i, field('piece', $.identifier)),
+        dont_shadow_statement: $ => kw(/dont-?shadow/i, field('piece', $.identifier)),
 
         expression: $ => choice(
             $._expression_not_binary,

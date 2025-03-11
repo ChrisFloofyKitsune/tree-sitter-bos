@@ -84,7 +84,7 @@
         "named": true
       },
       {
-        "type": "call_statement",
+        "type": "call_script_statement",
         "named": true
       },
       {
@@ -148,7 +148,7 @@
         "named": true
       },
       {
-        "type": "start_statement",
+        "type": "start_script_statement",
         "named": true
       },
       {
@@ -216,39 +216,15 @@
       "required": false,
       "types": [
         {
-          "type": "binary_expression",
-          "named": true
-        },
-        {
           "type": "call_expression",
           "named": true
         },
         {
-          "type": "degree_constant",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "linear_constant",
-          "named": true
-        },
-        {
-          "type": "number_literal",
-          "named": true
-        },
-        {
-          "type": "parenthesized_expression",
+          "type": "expression",
           "named": true
         },
         {
           "type": "preproc_defined",
-          "named": true
-        },
-        {
-          "type": "unary_expression",
           "named": true
         }
       ]
@@ -298,7 +274,7 @@
     "type": "attach_unit_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": true,
         "required": true,
         "types": [
@@ -439,7 +415,7 @@
     "type": "cache_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "piece": {
         "multiple": false,
         "required": true,
         "types": [
@@ -478,17 +454,23 @@
     }
   },
   {
-    "type": "call_statement",
+    "type": "call_script_statement",
     "named": true,
     "fields": {
-      "arg": {
-        "multiple": true,
+      "arguments": {
+        "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "expression_list",
+            "type": "argument_list",
             "named": true
-          },
+          }
+        ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
             "type": "identifier",
             "named": true
@@ -583,7 +565,7 @@
     "type": "dont_cache_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "piece": {
         "multiple": false,
         "required": true,
         "types": [
@@ -599,7 +581,7 @@
     "type": "dont_shade_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "piece": {
         "multiple": false,
         "required": true,
         "types": [
@@ -615,7 +597,7 @@
     "type": "dont_shadow_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "piece": {
         "multiple": false,
         "required": true,
         "types": [
@@ -631,7 +613,7 @@
     "type": "drop_unit_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": false,
         "required": true,
         "types": [
@@ -647,12 +629,22 @@
     "type": "emit_sfx_statement",
     "named": true,
     "fields": {
-      "arg": {
-        "multiple": true,
+      "argument": {
+        "multiple": false,
         "required": true,
         "types": [
           {
             "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
             "named": true
           }
         ]
@@ -663,8 +655,8 @@
     "type": "explode_statement",
     "named": true,
     "fields": {
-      "arg": {
-        "multiple": true,
+      "argument": {
+        "multiple": false,
         "required": true,
         "types": [
           {
@@ -672,22 +664,17 @@
             "named": true
           }
         ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
       }
-    }
-  },
-  {
-    "type": "expression_list",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -756,7 +743,7 @@
     "type": "get_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "call": {
         "multiple": false,
         "required": true,
         "types": [
@@ -787,7 +774,7 @@
     "type": "hide_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "piece": {
         "multiple": false,
         "required": true,
         "types": [
@@ -930,20 +917,32 @@
     "type": "move_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "axis": {
+        "multiple": false,
         "required": true,
         "types": [
           {
             "type": "axis",
             "named": true
-          },
+          }
+        ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
-            "type": "expression",
-            "named": true
-          },
-          {
-            "type": "speed_or_now",
+            "type": "identifier",
             "named": true
           }
         ]
@@ -1615,7 +1614,7 @@
     "type": "set_signal_mask_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1631,7 +1630,7 @@
     "type": "set_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": true,
         "required": true,
         "types": [
@@ -1647,7 +1646,7 @@
     "type": "show_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "piece": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1663,7 +1662,7 @@
     "type": "signal_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1679,7 +1678,7 @@
     "type": "sleep_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1740,34 +1739,35 @@
     }
   },
   {
-    "type": "speed_or_now",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "spin_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "axis": {
+        "multiple": false,
         "required": true,
         "types": [
           {
             "type": "axis",
             "named": true
-          },
+          }
+        ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
-            "type": "expression",
+            "type": "identifier",
             "named": true
           }
         ]
@@ -1775,17 +1775,23 @@
     }
   },
   {
-    "type": "start_statement",
+    "type": "start_script_statement",
     "named": true,
     "fields": {
-      "arg": {
-        "multiple": true,
+      "arguments": {
+        "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "expression_list",
+            "type": "argument_list",
             "named": true
-          },
+          }
+        ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
             "type": "identifier",
             "named": true
@@ -1814,16 +1820,32 @@
     "type": "stop_spin_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "axis": {
+        "multiple": false,
         "required": true,
         "types": [
           {
             "type": "axis",
             "named": true
-          },
+          }
+        ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
-            "type": "expression",
+            "type": "identifier",
             "named": true
           }
         ]
@@ -1853,20 +1875,32 @@
     "type": "turn_statement",
     "named": true,
     "fields": {
-      "arg": {
+      "argument": {
         "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "axis": {
+        "multiple": false,
         "required": true,
         "types": [
           {
             "type": "axis",
             "named": true
-          },
+          }
+        ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
-            "type": "expression",
-            "named": true
-          },
-          {
-            "type": "speed_or_now",
+            "type": "identifier",
             "named": true
           }
         ]
@@ -1879,49 +1913,25 @@
     "fields": {
       "argument": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
-          {
-            "type": "binary_expression",
-            "named": true
-          },
           {
             "type": "call_expression",
             "named": true
           },
           {
-            "type": "degree_constant",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "linear_constant",
-            "named": true
-          },
-          {
-            "type": "number_literal",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
+            "type": "expression",
             "named": true
           },
           {
             "type": "preproc_defined",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
             "named": true
           }
         ]
       },
       "operator": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "!",
@@ -1941,16 +1951,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -1972,14 +1972,20 @@
     "type": "wait_for_move_statement",
     "named": true,
     "fields": {
-      "arg": {
-        "multiple": true,
+      "axis": {
+        "multiple": false,
         "required": true,
         "types": [
           {
             "type": "axis",
             "named": true
-          },
+          }
+        ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
             "type": "identifier",
             "named": true
@@ -1992,14 +1998,20 @@
     "type": "wait_for_turn_statement",
     "named": true,
     "fields": {
-      "arg": {
-        "multiple": true,
+      "axis": {
+        "multiple": false,
         "required": true,
         "types": [
           {
             "type": "axis",
             "named": true
-          },
+          }
+        ]
+      },
+      "piece": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
             "type": "identifier",
             "named": true
