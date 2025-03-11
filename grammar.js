@@ -3,350 +3,375 @@
  * @author ChrisFloofyKitsune <chrisfloofykitsune@gmail.com>
  * @license GPL-2.0
  */
+const {PREC, c_rules, commaSep1, preprocIf} = require("./c_grammar");
 
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-function sepBy1(sep, rule) {
-  return seq(rule, repeat(seq(sep, rule)))
-}
-
-function sepBy(sep, rule) {
-  return optional(sepBy1(sep, rule))
-}
-
 function kw(keyword, ...rules) {
-  let argIndex = 1;
-  let argRules = rules.map(rule => {
-    // if regex or string, pass through
-    if (typeof rule === 'string' || rule instanceof RegExp) {
-      return rule;
-    }
+    let argRules = rules.map(rule => {
+        // if regex or string, pass through
+        if (typeof rule === 'string' || rule instanceof RegExp) {
+            return prec(2, rule);
+        }
 
-    // pass already labeled fields through
-    if (rule.type === 'FIELD') {
-      return rule
-    }
+        // pass already labeled fields through
+        if (rule.type === 'FIELD') {
+            return prec(1, token(rule));
+        }
 
-    // otherwise, mark as field with argIndex
-    return field(`arg${argIndex++}`, rule);
-  })
+        // otherwise, mark as argument
+        return field(`arg`, rule);
+    });
 
-  return seq(
-    field('keyword', keyword),
-    ...argRules,
-    ';'
-  )
+    return prec(PREC.CALL + 1, seq(
+        field('keyword', prec(3, token(keyword))),
+        ...argRules,
+        ';'
+    ));
 }
 
 module.exports = grammar({
-  name: "bos",
+    name: "bos",
 
-  word: $ => $._identifier,
+    word: $ => $.identifier,
 
-  conflicts: $ => [
-    [$.get_call],
-  ],
+    conflicts: $ => [
+        [$._block_item, $.statement],
+        [$.get_call],
+        [$._varying, $.preproc_call_expression]
+    ],
 
-  extras: $ => [
-    /\s|\\\r?\n/,
-    $.comment,
-    $.directive,
-    $.multiline_directive,
-  ],
+    extras: $ => [
+        /\s|\\\r?\n/,
+        $.comment,
+    ],
 
-  rules: {
-    source_file: $ => repeat(choice($._declaration, ';')),
+    inline: $ => [
+        $._expression_not_binary,
+    ],
 
-    _declaration: $ => choice(
-      $.piece_declaration,
-      $.static_var_declaration,
-      $.function_declaration,
-    ),
+    supertypes: $ => [
+        $.expression,
+        $.statement,
+        $.keyword_statement,
+        $.declaration,
+    ],
 
-    piece_declaration: $ => seq(
-      /piece/i,
-      sepBy1(',', field("name", $.piece_name)),
-      ';'
-    ),
-    piece_name: $ => $._identifier,
+    rules: {
+        source_file: $ => repeat($._top_level_item),
 
-    static_var_declaration: $ => seq(
-      /static-var/i,
-      sepBy1(',', field('name', $.var_name)),
-      ';'
-    ),
-    var_name: $ => $._identifier,
+        _top_level_item: $ => choice(
+            $.declaration,
+            $.macro_name_statement,
+            $.macro_call_statement,
+            alias($.preproc_if_top_level, $.preproc_if),
+            alias($.preproc_ifdef_top_level, $.preproc_ifdef),
+            $.preproc_include,
+            $.preproc_def,
+            $.preproc_function_def,
+            $.preproc_call,
+            ';',
+        ),
 
-    function_declaration: $ => seq(
-      field("name", $.func_name),
-      field("args", choice('()', seq('(', sepBy1(',', $.arg_name), ')'))),
-      field("body", $.statement_block),
-    ),
-    func_name: $ => $._identifier,
-    arg_name: $ => $._identifier,
+        _block_item: $ => choice(
+            $.statement,
+            $.macro_name_statement,
+            $.macro_call_statement,
+            $.preproc_if,
+            $.preproc_ifdef,
+            $.preproc_include,
+            $.preproc_def,
+            $.preproc_function_def,
+            $.preproc_call,
+            ';',
+        ),
 
-    statement_block: $ => choice(
-      seq('{', repeat($._statement), '}'),
-      $._statement,
-    ),
+        macro_name_statement: $ => seq(
+            $.identifier,
+            optional(';'),
+            token.immediate(/\r?\n/),
+        ),
 
-    _statement: $ => choice(
-      $.keyword_statement,
-      $.var_statement,
-      $.if_statement,
-      $.while_statement,
-      $.assign_statement,
-      $.return_statement,
-      ';',
-    ),
+        macro_call_statement: $ => prec(PREC.CALL, seq(
+            $._macro_call_expression,
+            optional(';'),
+            token.immediate(/\r?\n/),
+        )),
 
-    var_statement: $ => seq(
-      /var/i,
-      sepBy1(',', $.var_name),
-      ';'
-    ),
+        declaration: $ => prec(10, choice(
+            $.piece_declaration,
+            $.static_var_declaration,
+            $.function_declaration
+        )),
 
-    if_statement: $ => prec.left(seq(
-      /if/i,
-      '(',
-      field("condition", $._expression),
-      ')',
-      field("then", $.statement_block),
-      optional(seq(/else/i, field("else", $.statement_block))),
-    )),
+        piece_declaration: $ => prec(10, seq(
+            /piece/i,
+            commaSep1(field("name", $.identifier)),
+            ';'
+        )),
 
-    while_statement: $ => seq(
-      /while/i,
-      '(',
-      field("condition", $._expression),
-      ')',
-      field("body", $.statement_block),
-    ),
+        static_var_declaration: $ => prec(10, seq(
+            /static-var/i,
+            commaSep1(field('name', $.identifier)),
+            ';'
+        )),
 
-    assign_statement: $ => choice(
-      seq(field("name", $.var_name), '=', field("value", $._expression), ';'),
-      $.increment_statement,
-      $.decrement_statement,
-    ),
-    increment_statement: $ => seq(
-      '++', field("name", $.var_name), ';'
-    ),
-    decrement_statement: $ => seq(
-      '--', field("name", $.var_name), ';'
-    ),
+        function_declaration: $ => prec(10, seq(
+            field("name", $.identifier),
+            choice('()', seq('(', commaSep1(field("arg", $.identifier)), ')')),
+            field("body", $.compound_statement),
+        )),
 
-    return_statement: $ => seq(
-      /return/i,
-      optional(field("value", $._expression)),
-      ';'
-    ),
+        compound_statement: $ => seq(
+            '{',
+            repeat($._block_item),
+            '}',
+        ),
 
-    keyword_statement: $ => choice(
-        $.call_statement,
-        $.start_statement,
+        statement: $ => choice(
+            $.compound_statement,
+            $.keyword_statement,
+            $.var_statement,
+            $.if_statement,
+            $.while_statement,
+            $.assign_statement,
+            $.return_statement,
+            ';',
+        ),
 
-        $.signal_statement,
-        $.set_signal_mask_statement,
+        var_statement: $ => seq(
+            /var/i,
+            commaSep1($.identifier),
+            ';'
+        ),
 
-        $.sleep_statement,
+        if_statement: $ => prec.left(seq(
+            /if/i,
+            '(',
+            field("condition", $.expression),
+            ')',
+            field("then", $.statement),
+            optional(seq(/else/i, field("else", $.statement))),
+        )),
 
-        $.set_statement,
-        $.get_statement,
+        while_statement: $ => seq(
+            /while/i,
+            '(',
+            field("condition", $.expression),
+            ')',
+            field("body", $.statement),
+        ),
 
-        $.spin_statement,
-        $.stop_spin_statement,
+        assign_statement: $ => choice(
+            seq(field("name", $.identifier), '=', field("value", $.expression), ';'),
+            $.increment_statement,
+            $.decrement_statement,
+        ),
 
-        $.turn_statement,
-        $.move_statement,
+        increment_statement: $ => seq(
+            '++', field("name", $.identifier), ';'
+        ),
+        decrement_statement: $ => seq(
+            '--', field("name", $.identifier), ';'
+        ),
 
-        $.wait_for_turn_statement,
-        $.wait_for_move_statement,
+        return_statement: $ => seq(
+            /return/i,
+            optional($.expression),
+            ';'
+        ),
 
-        $.hide_statement,
-        $.show_statement,
+        keyword_statement: $ => prec.left(11, choice(
+            $.call_statement,
+            $.start_statement,
 
-        // $.play_sound_statement,
-        $.emit_sfx_statement,
-        $.explode_statement,
+            $.signal_statement,
+            $.set_signal_mask_statement,
 
-        $.attach_unit_statement,
-        $.drop_unit_statement,
+            $.sleep_statement,
 
-        $.cache_statement,
-        $.dont_cache_statement,
-        $.dont_shadow_statement,
-        $.dont_shade_statement,
-    ),
+            $.set_statement,
+            $.get_statement,
 
-    axis: $ => choice(
-      /x-?axis/i, /y-?axis/i, /z-?axis/i
-    ),
+            $.spin_statement,
+            $.stop_spin_statement,
 
-    expression_list: $ => sepBy1(',', $._expression),
-    call_statement: $ => choice(
-      kw(/call-?script/i, $.func_name, '()'),
-      kw(/call-?script/i, $.func_name, '(', $.expression_list, ')')
-    ),
-    start_statement: $ => choice(
-      kw(/start-?script/i, $.func_name, '()'),
-      kw(/start-?script/i, $.func_name, '(', $.expression_list, ')'),
-    ),
+            $.turn_statement,
+            $.move_statement,
 
-    signal_statement: $ => kw(/signal/i, $._expression),
-    set_signal_mask_statement: $ => kw(/set-?signal-?mask/i, $._expression),
+            $.wait_for_turn_statement,
+            $.wait_for_move_statement,
 
-    sleep_statement: $ => kw(/sleep/i, $._expression),
+            $.hide_statement,
+            $.show_statement,
 
-    set_statement: $ => kw(/set/i, $._expression, /to/i, $._expression),
-    get_statement: $ => kw(/get/i, $.get_call),
+            // $.play_sound_statement,
+            $.emit_sfx_statement,
+            $.explode_statement,
 
-    spin_statement: $ => kw(
-      /spin/i, $.piece_name, /around/i, $.axis, /speed/i, $._expression,
-      optional(seq(/accelerate/i, $._expression))
-    ),
-    stop_spin_statement: $ => kw(
-      /stop-?spin/i, $.piece_name, /around/i, $.axis,
-      optional(seq(/decelerate/i, $._expression))
-    ),
+            $.attach_unit_statement,
+            $.drop_unit_statement,
 
-    speed_or_now: $ => choice(/now/i, seq(/speed/i, $._expression)),
-    turn_statement: $ => kw(/turn/i, $.piece_name, /to/i, $.axis, $._expression, $.speed_or_now),
-    move_statement: $ => kw(/move/i, $.piece_name, /to/i, $.axis, $._expression, $.speed_or_now),
+            $.cache_statement,
+            $.dont_cache_statement,
+            $.dont_shadow_statement,
+            $.dont_shade_statement,
+        )),
 
-    wait_for_turn_statement: $ => kw(/wait-?for-?turn/i, $.piece_name, /around/i, $.axis,),
-    wait_for_move_statement: $ => kw(/wait-?for-?move/i, $.piece_name, /along/i, $.axis,),
+        axis: _ => choice(
+            /x-?axis/i, /y-?axis/i, /z-?axis/i
+        ),
 
-    hide_statement: $ => kw(/hide/i, $.piece_name),
-    show_statement: $ => kw(/show/i, $.piece_name),
+        expression_list: $ => commaSep1($.expression),
 
-    // play_sound_statement: $ => undefined,
-    emit_sfx_statement: $ => kw(/emit-?sfx/i, $._expression, /from/i, $.piece_name),
-    explode_statement: $ => kw(/explode/i, $.piece_name, /type/i, $._expression),
+        call_statement: $ => choice(
+            kw(/call-?script/i, $.identifier, '()'),
+            kw(/call-?script/i, $.identifier, '(', $.expression_list, ')')
+        ),
+        start_statement: $ => choice(
+            kw(/start-?script/i, $.identifier, '()'),
+            kw(/start-?script/i, $.identifier, '(', $.expression_list, ')'),
+        ),
+        signal_statement: $ => kw(/signal/i, $.expression),
 
-    attach_unit_statement: $ => kw(/attach-?unit/i, $._expression, /to/i, $._expression),
-    drop_unit_statement: $ => kw(/drop-?unit/i, $._expression),
+        set_signal_mask_statement: $ => kw(/set-?signal-?mask/i, $.expression),
+        sleep_statement: $ => kw(/sleep/i, $.expression),
 
-    cache_statement: $ => kw(/cache/i, $.piece_name),
-    dont_cache_statement: $ => kw(/dont-?cache/i, $.piece_name),
-    dont_shadow_statement: $ => kw(/dont-?shadow/i, $.piece_name),
-    dont_shade_statement: $ => kw(/dont-?shade/i, $.piece_name),
+        set_statement: $ => kw(/set/i, $.expression, /to/i, $.expression),
 
-    _expression: $ => choice(
-      prec(100, seq('(', $._expression, ')')),
-      prec(90, $.const_term),
-      prec(80, $.varying_term),
-      prec(70, $.unary_expression),
-      prec(60, $.binary_expression),
-    ),
+        get_statement: $ => kw(/get/i, $.get_call),
+        spin_statement: $ => kw(
+            /spin/i, $.identifier, /around/i, $.axis, /speed/i, $.expression,
+            optional(seq(/accelerate/i, $.expression))
+        ),
 
-    const_term: $ => choice(
-      prec(92, seq('(', $.constant, ')')),
-      prec(91, $.constant),
-    ),
+        stop_spin_statement: $ => kw(
+            /stop-?spin/i, $.identifier, /around/i, $.axis,
+            optional(seq(/decelerate/i, $.expression))
+        ),
+        speed_or_now: $ => choice(/now/i, seq(/speed/i, $.expression)),
 
-    varying_term: $ => choice(
-      prec(83, $.rand_term),
-      prec(82, seq(/get/i, $.get_call)),
-      prec(81, $.var_name)
-    ),
+        turn_statement: $ => kw(/turn/i, $.identifier, /to/i, $.axis, $.expression, $.speed_or_now),
+        move_statement: $ => kw(/move/i, $.identifier, /to/i, $.axis, $.expression, $.speed_or_now),
+        wait_for_turn_statement: $ => kw(/wait-?for-?turn/i, $.identifier, /around/i, $.axis,),
 
-    unary_expression: $ => choice(
-      prec(72, seq(choice('!', /not/i), $._expression)),
-      // negation not supported at this time
-    ),
+        wait_for_move_statement: $ => kw(/wait-?for-?move/i, $.identifier, /along/i, $.axis,),
+        hide_statement: $ => kw(/hide/i, $.identifier),
 
-    binary_expression: $ => choice(
-      prec(62, $.multiplicative_expression),
-      prec(61, $.additive_expression),
-      prec(51, $.comparative_expression),
-      prec(50, $.equals_expression),
-      prec(40, $.bitwise_expression),
-      prec(30, $.logical_expression),
-    ),
+        show_statement: $ => kw(/show/i, $.identifier),
+        emit_sfx_statement: $ => kw(/emit-?sfx/i, $.expression, /from/i, $.identifier),
 
-    multiplicative_expression: $ => prec.left(62, seq(
-      field('operand1', $._expression),
-      field('operator', choice('*', '/', '%')),
-      field('operand2', $._expression),
-    )),
+        // play_sound_statement: $ => undefined,
+        explode_statement: $ => kw(/explode/i, $.identifier, /type/i, $.expression),
+        attach_unit_statement: $ => kw(/attach-?unit/i, $.expression, /to/i, $.expression),
 
-    additive_expression: $ => prec.left(61, seq(
-      field('operand1', $._expression),
-      field('operator', choice('+', '-')),
-      field('operand2', $._expression),
-    )),
+        drop_unit_statement: $ => kw(/drop-?unit/i, $.expression),
+        cache_statement: $ => kw(/cache/i, $.identifier),
 
-    comparative_expression: $ => prec.left(51, seq(
-      field('operand1', $._expression),
-      field('operator', choice('<', '>', '<=', '>=')),
-      field('operand2', $._expression),
-    )),
+        dont_cache_statement: $ => kw(/dont-?cache/i, $.identifier),
+        dont_shadow_statement: $ => kw(/dont-?shadow/i, $.identifier),
+        dont_shade_statement: $ => kw(/dont-?shade/i, $.identifier),
 
-    equals_expression: $ => prec.left(50, seq(
-      field('operand1', $._expression),
-      field('operator', choice('==', '!=')),
-      field('operand2', $._expression),
-    )),
+        expression: $ => choice(
+            $._expression_not_binary,
+            $.binary_expression,
+        ),
 
-    bitwise_expression: $ => choice(
-      prec.left(43, seq(field('operand1', $._expression), field('operator', '&'), field('operand2', $._expression))),
-      prec.left(42, seq(field('operand1', $._expression), field('operator', '|'), field('operand2', $._expression))),
-      prec.left(41, seq(field('operand1', $._expression), field('operator', '^'), field('operand2', $._expression))),
-    ),
+        _expression_not_binary: $ => choice(
+            $.parenthesized_expression,
+            $._macro_call_expression,
+            $._constant,
+            $._varying,
+            $.unary_expression,
+            $.true,
+            $.false,
+        ),
 
-    logical_expression: $ => choice(
-      prec.left(33, seq(field('operand1', $._expression), field('operator', choice('&&', /and/i)), field('operand2', $._expression))),
-      prec.left(32, seq(field('operand1', $._expression), field('operator', choice('||', /or/i)), field('operand2', $._expression))),
-      prec.left(31, seq(field('operand1', $._expression), field('operator', choice('^^', /xor/i)), field('operand2', $._expression))),
-    ),
+        parenthesized_expression: $ => seq('(', $.expression, ')',),
 
-    rand_term: $ => seq(
-      /rand/i,
-      '(',
-      field('lower_bound', $._expression),
-      ',',
-      field('upper_bound', $._expression),
-      ')'
-    ),
+        _macro_call_expression: $ => alias($.preproc_call_expression, $.macro_call_expression),
 
+        get_term: $ => seq(/get/i, $.get_call),
 
-    get_call: $ => choice(
-      prec(1, field('value_index', $._expression)),
-      seq(field('value_index', $._expression),
-        '(',
-        field('arg1', $._expression),
-        optional(seq(',', field('arg2', $._expression))),
-        optional(seq(',', field('arg3', $._expression))),
-        optional(seq(',', field('arg4', $._expression))),
-        ')'
-      ),
-    ),
+        unary_expression: $ => prec.left(PREC.UNARY, seq(
+            field('operator', choice('!', /not/i)),
+            field('argument', $.expression),
+        )),
 
-    constant: $ => choice(
-      $.linear_constant,
-      $.degree_constant,
-      seq(optional('-'), $.number),
-    ),
+        binary_expression: $ => {
+            const table = [
+                ['+', PREC.ADD],
+                ['-', PREC.ADD],
+                ['*', PREC.MULTIPLY],
+                ['/', PREC.MULTIPLY],
+                ['%', PREC.MULTIPLY],
+                [alias(choice('||', /or/i), '||'), PREC.LOGICAL_OR],
+                [alias(choice('&&', /and/i), '&&'), PREC.LOGICAL_AND],
+                ['|', PREC.INCLUSIVE_OR],
+                ['^', PREC.EXCLUSIVE_OR],
+                ['&', PREC.BITWISE_AND],
+                ['==', PREC.EQUAL],
+                ['!=', PREC.EQUAL],
+                ['>', PREC.RELATIONAL],
+                ['>=', PREC.RELATIONAL],
+                ['<=', PREC.RELATIONAL],
+                ['<', PREC.RELATIONAL],
+                // ['<<', PREC.SHIFT],
+                // ['>>', PREC.SHIFT],
+            ];
 
-    linear_constant: $ => seq('[', optional('-'), $.number, ']'),
-    degree_constant: $ => seq('<', optional('-'), $.number, '>'),
-    number: $ => choice($._float, $._integer),
-    _float: $ => /[0-9]+\.[0-9]*|\.[0-9]+/,
-    _integer: $ => /[0-9]+|0x[0-9a-fA-F]+/,
+            return choice(...table.map(([operator, precedence]) => {
+                return prec.left(precedence, seq(
+                    field('left', $.expression),
+                    // @ts-ignore
+                    field('operator', operator),
+                    field('right', $.expression),
+                ));
+            }));
+        },
 
-    _identifier: $ => /[a-z_][a-z_0-9]*/i,
+        rand_call: $ => seq(
+            /rand/i,
+            '(',
+            field('lower_bound', $.expression),
+            ',',
+            field('upper_bound', $.expression),
+            ')'
+        ),
 
+        get_call: $ => choice(
+            field('value_index', $.expression),
+            seq(field('value_index', $.expression),
+                '(',
+                field('arg', $.expression),
+                optional(seq(',', field('arg', $.expression))),
+                optional(seq(',', field('arg', $.expression))),
+                optional(seq(',', field('arg', $.expression))),
+                ')'
+            ),
+        ),
 
-    comment: $ => token(choice(
-      seq('//', /(\\+(.|\r?\n)|[^\\\n])*/),
-      seq(
-        '/*',
-        /[^*]*\*+([^/*][^*]*\*+)*/,
-        '/',
-      ),
-    )),
-    directive: $ => /#.*/,
-    multiline_directive: $ => token(prec(1, /#(?:.*\\\r?\n)+.+/)),
-  }
+        _varying: $ => choice(
+            $.rand_call,
+            $.get_term,
+            prec.dynamic(1, $.identifier),
+        ),
+
+        _constant: $ => choice(
+            $.linear_constant,
+            $.degree_constant,
+            $.number_literal,
+        ),
+
+        linear_constant: $ => seq('[', choice($.number_literal, $.identifier), ']'),
+
+        degree_constant: $ => seq('<', choice($.number_literal, $.identifier), '>'),
+        identifier: $ => /[a-z_][a-z_0-9]*/i,
+
+        ...c_rules,
+
+        ...preprocIf("", $ => $._block_item),
+        ...preprocIf("_top_level", $ => $._top_level_item),
+    }
 });

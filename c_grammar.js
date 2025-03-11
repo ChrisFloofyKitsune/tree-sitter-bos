@@ -27,146 +27,206 @@ SOFTWARE.
 */
 
 const PREC = {
-  PAREN_DECLARATOR: -10,
-  ASSIGNMENT: -2,
-  CONDITIONAL: -1,
-  DEFAULT: 0,
-  LOGICAL_OR: 1,
-  LOGICAL_AND: 2,
-  INCLUSIVE_OR: 3,
-  EXCLUSIVE_OR: 4,
-  BITWISE_AND: 5,
-  EQUAL: 6,
-  RELATIONAL: 7,
-  OFFSETOF: 8,
-  SHIFT: 9,
-  ADD: 10,
-  MULTIPLY: 11,
-  CAST: 12,
-  SIZEOF: 13,
-  UNARY: 14,
-  CALL: 15,
-  FIELD: 16,
-  SUBSCRIPT: 17,
+    PAREN_DECLARATOR: -10,
+    ASSIGNMENT: -2,
+    CONDITIONAL: -1,
+    DEFAULT: 0,
+    LOGICAL_OR: 1,
+    LOGICAL_AND: 2,
+    INCLUSIVE_OR: 3,
+    EXCLUSIVE_OR: 4,
+    BITWISE_AND: 5,
+    EQUAL: 6,
+    RELATIONAL: 7,
+    OFFSETOF: 8,
+    SHIFT: 9,
+    ADD: 10,
+    MULTIPLY: 11,
+    CAST: 12,
+    SIZEOF: 13,
+    UNARY: 14,
+    CALL: 15,
+    FIELD: 16,
+    SUBSCRIPT: 17,
 };
 
-module.exports.preprocessor_rules = {
-   // Preprocessor
+module.exports.c_rules = {
+    // Preprocessor
 
     preproc_include: $ => seq(
-      preprocessor('include'),
-      field('path', choice(
-        $.string_literal,
-        $.system_lib_string,
-        $.identifier,
-        alias($.preproc_call_expression, $.call_expression),
-      )),
-      token.immediate(/\r?\n/),
+        preprocessor('include'),
+        field('path', choice(
+            $.string_literal,
+            $.system_lib_string,
+            $.identifier,
+            alias($.preproc_call_expression, $.call_expression),
+        )),
+        token.immediate(/\r?\n/),
     ),
 
     preproc_def: $ => seq(
-      preprocessor('define'),
-      field('name', $.identifier),
-      field('value', optional($.preproc_arg)),
-      token.immediate(/\r?\n/),
+        preprocessor('define'),
+        field('name', $.identifier),
+        field('value', optional($.preproc_arg)),
+        token.immediate(/\r?\n/),
     ),
 
     preproc_function_def: $ => seq(
-      preprocessor('define'),
-      field('name', $.identifier),
-      field('parameters', $.preproc_params),
-      field('value', optional($.preproc_arg)),
-      token.immediate(/\r?\n/),
+        preprocessor('define'),
+        field('name', $.identifier),
+        field('parameters', $.preproc_params),
+        field('value', optional($.preproc_arg)),
+        token.immediate(/\r?\n/),
     ),
 
     preproc_params: $ => seq(
-      token.immediate('('), commaSep(choice($.identifier, '...')), ')',
+        token.immediate('('), commaSep(choice($.identifier, '...')), ')',
     ),
 
     preproc_call: $ => seq(
-      field('directive', $.preproc_directive),
-      field('argument', optional($.preproc_arg)),
-      token.immediate(/\r?\n/),
+        field('directive', $.preproc_directive),
+        field('argument', optional($.preproc_arg)),
+        token.immediate(/\r?\n/),
     ),
 
-    ...preprocIf($ => $._block_item),
-
     preproc_arg: _ => token(prec(-1, /\S([^/\n]|\/[^*]|\\\r?\n)*/)),
-    preproc_directive: _ => /#[ \t]*[a-zA-Z0-9]\w*/,
+    preproc_directive: _ => token(prec(-1, /#[ \t]*[a-zA-Z0-9]\w*/)),
 
     _preproc_expression: $ => choice(
-      $.identifier,
-      alias($.preproc_call_expression, $.call_expression),
-      $.number_literal,
-      $.char_literal,
-      $.preproc_defined,
-      alias($.preproc_unary_expression, $.unary_expression),
-      alias($.preproc_binary_expression, $.binary_expression),
-      alias($.preproc_parenthesized_expression, $.parenthesized_expression),
+        $.identifier,
+        alias($.preproc_call_expression, $.call_expression),
+        $._constant,
+        $.preproc_defined,
+        alias($.preproc_unary_expression, $.unary_expression),
+        alias($.preproc_binary_expression, $.binary_expression),
+        alias($.preproc_parenthesized_expression, $.parenthesized_expression),
     ),
 
     preproc_parenthesized_expression: $ => seq(
-      '(',
-      $._preproc_expression,
-      ')',
+        '(',
+        $._preproc_expression,
+        ')',
     ),
 
     preproc_defined: $ => choice(
-      prec(PREC.CALL, seq('defined', '(', $.identifier, ')')),
-      seq('defined', $.identifier),
+        prec(PREC.CALL, seq('defined', '(', $.identifier, ')')),
+        seq('defined', $.identifier),
     ),
 
     preproc_unary_expression: $ => prec.left(PREC.UNARY, seq(
-      field('operator', choice('!', '~', '-', '+')),
-      field('argument', $._preproc_expression),
+        field('operator', choice('!', '~', '-', '+')),
+        field('argument', $._preproc_expression),
     )),
 
-    preproc_call_expression: $ => prec(PREC.CALL, seq(
-      field('function', $.identifier),
-      field('arguments', alias($.preproc_argument_list, $.argument_list)),
+    preproc_call_expression: $ => prec.dynamic(-1, seq(
+        field('function', $.identifier),
+        field('arguments', alias($.preproc_argument_list, $.argument_list)),
     )),
 
     preproc_argument_list: $ => seq(
-      '(',
-      commaSep($._preproc_expression),
-      ')',
+        '(',
+        commaSep($._preproc_expression),
+        ')',
     ),
 
     preproc_binary_expression: $ => {
-      const table = [
-        ['+', PREC.ADD],
-        ['-', PREC.ADD],
-        ['*', PREC.MULTIPLY],
-        ['/', PREC.MULTIPLY],
-        ['%', PREC.MULTIPLY],
-        ['||', PREC.LOGICAL_OR],
-        ['&&', PREC.LOGICAL_AND],
-        ['|', PREC.INCLUSIVE_OR],
-        ['^', PREC.EXCLUSIVE_OR],
-        ['&', PREC.BITWISE_AND],
-        ['==', PREC.EQUAL],
-        ['!=', PREC.EQUAL],
-        ['>', PREC.RELATIONAL],
-        ['>=', PREC.RELATIONAL],
-        ['<=', PREC.RELATIONAL],
-        ['<', PREC.RELATIONAL],
-        ['<<', PREC.SHIFT],
-        ['>>', PREC.SHIFT],
-      ];
+        const table = [
+            ['+', PREC.ADD],
+            ['-', PREC.ADD],
+            ['*', PREC.MULTIPLY],
+            ['/', PREC.MULTIPLY],
+            ['%', PREC.MULTIPLY],
+            [alias(choice('||', /or/i), '||'), PREC.LOGICAL_OR],
+            [alias(choice('&&', /and/i), '&&'), PREC.LOGICAL_AND],
+            ['^', PREC.EXCLUSIVE_OR],
+            ['&', PREC.BITWISE_AND],
+            ['==', PREC.EQUAL],
+            ['!=', PREC.EQUAL],
+            ['>', PREC.RELATIONAL],
+            ['>=', PREC.RELATIONAL],
+            ['<=', PREC.RELATIONAL],
+            ['<', PREC.RELATIONAL],
+            ['<<', PREC.SHIFT],
+            ['>>', PREC.SHIFT],
+        ];
 
-      return choice(...table.map(([operator, precedence]) => {
-        return prec.left(precedence, seq(
-          field('left', $._preproc_expression),
-          // @ts-ignore
-          field('operator', operator),
-          field('right', $._preproc_expression),
-        ));
-      }));
+        return choice(...table.map(([operator, precedence]) => {
+            return prec.left(precedence, seq(
+                field('left', $._preproc_expression),
+                // @ts-ignore
+                field('operator', operator),
+                field('right', $._preproc_expression),
+            ));
+        }));
     },
+
+    number_literal: _ => {
+        const separator = /['_]/;
+        const hex = /[0-9a-fA-F]/;
+        const decimal = /[0-9]/;
+        const hexDigits = seq(repeat1(hex), repeat(seq(separator, repeat1(hex))));
+        const decimalDigits = seq(repeat1(decimal), repeat(seq(separator, repeat1(decimal))));
+        return token(seq(
+            optional(/[-+]/),
+            optional(choice(/0[xX]/, /0[bB]/)),
+            choice(
+                seq(
+                    choice(
+                        decimalDigits,
+                        seq(/0[xX]/, hexDigits),
+                    ),
+                    optional(seq('.', optional(hexDigits))),
+                ),
+                seq('.', decimalDigits),
+            ),
+            /[fF]*/,
+        ));
+    },
+
+    string_literal: $ => seq(
+        '"',
+        repeat(choice(
+            alias(token.immediate(prec(1, /[^\\"\n]+/)), $.string_content),
+            $.escape_sequence,
+        )),
+        '"',
+    ),
+
+    escape_sequence: _ => token(prec(1, seq(
+        '\\',
+        choice(
+            /[^xuU]/,
+            /\d{2,3}/,
+            /x[0-9a-fA-F]{1,4}/,
+            /u[0-9a-fA-F]{4}/,
+            /U[0-9a-fA-F]{8}/,
+        ),
+    ))),
+
+    system_lib_string: _ => token(seq(
+        '<',
+        repeat(choice(/[^>\n]/, '\\>')),
+        '>',
+    )),
+
+    true: _ => token(choice('TRUE', 'true')),
+    false: _ => token(choice('FALSE', 'false')),
+
+    // http://stackoverflow.com/questions/13014947/regex-to-match-a-c-style-multiline-comment/36328890#36328890
+    comment: _ => token(choice(
+        seq('//', /(\\+(.|\r?\n)|[^\\\n])*/),
+        seq(
+            '/*',
+            /[^*]*\*+([^/*][^*]*\*+)*/,
+            '/',
+        ),
+    )),
 
 }
 
 /**
+ *
+ * @param {string} suffix
  *
  * @param {RuleBuilder<string>} content
  *
@@ -174,59 +234,59 @@ module.exports.preprocessor_rules = {
  *
  * @returns {RuleBuilders<string, string>}
  */
-function preprocIf(content, precedence = 0) {
-  /**
-   *
-   * @param {GrammarSymbols<string>} $
-   *
-   * @returns {ChoiceRule}
-   */
-  function alternativeBlock($) {
-    return choice(
-      $.preproc_else,
-      $.preproc_elif,
-      $.preproc_elifdef,
-    );
-  }
+function preprocIf(suffix, content, precedence = 0) {
+    /**
+     *
+     * @param {GrammarSymbols<string>} $
+     *
+     * @returns {ChoiceRule}
+     */
+    function alternativeBlock($) {
+        return choice(
+            suffix ? alias($['preproc_else' + suffix], $.preproc_else) : $.preproc_else,
+            suffix ? alias($['preproc_elif' + suffix], $.preproc_elif) : $.preproc_elif,
+            suffix ? alias($['preproc_elifdef' + suffix], $.preproc_elifdef) : $.preproc_elifdef,
+        );
+    }
 
-  return {
-    ['preproc_if']: $ => prec(precedence, seq(
-      preprocessor('if'),
-      field('condition', $._preproc_expression),
-      '\n',
-      repeat(content($)),
-      field('alternative', optional(alternativeBlock($))),
-      preprocessor('endif'),
-    )),
+    return {
+        ['preproc_if' + suffix]: $ => prec(precedence, seq(
+            preprocessor('if'),
+            field('condition', $._preproc_expression),
+            '\n',
+            repeat(content($)),
+            field('alternative', optional(alternativeBlock($))),
+            preprocessor('endif'),
+        )),
 
-    ['preproc_ifdef']: $ => prec(precedence, seq(
-      choice(preprocessor('ifdef'), preprocessor('ifndef')),
-      field('name', $.identifier),
-      repeat(content($)),
-      field('alternative', optional(alternativeBlock($))),
-      preprocessor('endif'),
-    )),
+        ['preproc_ifdef' + suffix]: $ => prec(precedence, seq(
+            choice(preprocessor('ifdef'), preprocessor('ifndef')),
+            field('name', $.identifier),
+            repeat(content($)),
+            field('alternative', optional(alternativeBlock($))),
+            preprocessor('endif'),
+        )),
 
-    ['preproc_else']: $ => prec(precedence, seq(
-      preprocessor('else'),
-      repeat(content($)),
-    )),
+        ['preproc_else' + suffix]: $ => prec(precedence, seq(
+            preprocessor('else'),
+            repeat(content($)),
+        )),
 
-    ['preproc_elif']: $ => prec(precedence, seq(
-      preprocessor('elif'),
-      field('condition', $._preproc_expression),
-      '\n',
-      repeat(content($)),
-      field('alternative', optional(alternativeBlock($))),
-    )),
+        ['preproc_elif' + suffix]: $ => prec(precedence, seq(
+            preprocessor('elif'),
+            field('condition', $._preproc_expression),
+            '\n',
+            repeat(content($)),
+            field('alternative', optional(alternativeBlock($))),
+        )),
 
-    ['preproc_elifdef']: $ => prec(precedence, seq(
-      choice(preprocessor('elifdef'), preprocessor('elifndef')),
-      field('name', $.identifier),
-      repeat(content($)),
-      field('alternative', optional(alternativeBlock($))),
-    )),
-  };
+        ['preproc_elifdef' + suffix]: $ => prec(precedence, seq(
+            choice(preprocessor('elifdef'), preprocessor('elifndef')),
+            field('name', $.identifier),
+            repeat(content($)),
+            field('alternative', optional(alternativeBlock($))),
+        )),
+    };
 }
 
 /**
@@ -237,7 +297,7 @@ function preprocIf(content, precedence = 0) {
  * @returns {AliasRule}
  */
 function preprocessor(command) {
-  return alias(new RegExp('#[ \t]*' + command), '#' + command);
+    return alias(new RegExp('#[ \t]*' + command), '#' + command);
 }
 
 /**
@@ -248,7 +308,7 @@ function preprocessor(command) {
  * @returns {ChoiceRule}
  */
 function commaSep(rule) {
-  return optional(commaSep1(rule));
+    return optional(commaSep1(rule));
 }
 
 /**
@@ -259,7 +319,7 @@ function commaSep(rule) {
  * @returns {SeqRule}
  */
 function commaSep1(rule) {
-  return seq(rule, repeat(seq(',', rule)));
+    return seq(rule, repeat(seq(',', rule)));
 }
 
 module.exports.PREC = PREC;

@@ -1,0 +1,144 @@
+=============
+Get Statement
+=============
+
+function() {
+    // control keyword statement
+    show pieceName;
+    // get statements
+    get UNIT_XZ;
+    get PRINT(1, 2, 3, 4);
+    get 100;
+}
+
+----------------
+(source_file (function_declaration (identifier) (compound_statement
+    (comment)
+    (show_statement
+        (identifier))
+    (comment)
+    (get_statement
+        (get_call 
+            (identifier))
+    )
+    (get_statement
+        (get_call
+            (identifier)
+            (number_literal)
+            (number_literal)
+            (number_literal)
+            (number_literal)
+        )
+    )
+    (get_statement
+        (get_call
+            (number_literal)
+        )
+    )
+)))
+
+===========================
+Cursed Get Call Value index
+===========================
+
+function() {
+    get UNKNOWN_UNIT_VALUE(69);
+    get 100(100);
+    get (10+1)(2*variable);
+    UNKNOWN_UNIT_VALUE(200);
+    get UNKNOWN_UNIT_VALUE(200)(<123.4>);
+    get UNKNOWN_UNIT_VALUE(1)(get UNKNOWN_UNIT_VALUE(2));
+}
+
+------------------------
+(source_file (function_declaration (identifier) (compound_statement
+    (get_statement
+        (get_call
+            (identifier)
+            (number_literal)
+        )
+    )
+    (get_statement
+        (get_call
+            (number_literal)
+            (number_literal)
+        )
+    )
+    (get_statement
+        (get_call
+            (parenthesized_expression (binary_expression
+                (number_literal)
+                (number_literal)
+            ))
+            (binary_expression
+                (number_literal)
+                (identifier)
+            )
+        )
+    )
+    (macro_call_statement (macro_call_expression
+        (identifier)
+        (argument_list (number_literal))
+    ))
+    (get_statement
+        (get_call
+            (macro_call_expression
+                (identifier)
+                (argument_list (number_literal))
+            )
+            (degree_constant (number_literal))
+        )
+    )
+    (get_statement
+        (get_call
+            (macro_call_expression
+                (identifier)
+                (argument_list (number_literal))
+            )
+            (get_term (get_call
+                (identifier)
+                (number_literal)
+            ))
+        )
+    )
+)))
+
+================
+Nested Get Terms
+================
+
+function() {
+    if (bInDistance AND get UNKNOWN_UNIT_VALUE(74)(unitid) == get UNKNOWN_UNIT_VALUE(74)(get UNKNOWN_UNIT_VALUE(71)))
+    {
+    }
+}
+
+----------------
+
+(source_file (function_declaration (identifier) (compound_statement
+    (if_statement
+        (binary_expression
+            (identifier)
+            (binary_expression
+                (get_term (get_call
+                    (macro_call_expression
+                        (identifier)
+                        (argument_list (number_literal))
+                    )
+                    (identifier)
+                ))
+                (get_term (get_call
+                    (macro_call_expression
+                        (identifier)
+                        (argument_list (number_literal))
+                    )
+                    (get_term (get_call
+                        (identifier)
+                        (number_literal)
+                    ))
+                ))
+            )
+        )
+        (compound_statement)
+    )
+)))
