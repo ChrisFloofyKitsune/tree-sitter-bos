@@ -222,7 +222,7 @@
         "named": true
       },
       {
-        "type": "var_name",
+        "type": "var_name_term",
         "named": true
       }
     ]
@@ -263,7 +263,7 @@
         "required": false,
         "types": [
           {
-            "type": "identifier",
+            "type": "var_name",
             "named": true
           }
         ]
@@ -601,7 +601,7 @@
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "var_name",
             "named": true
           }
         ]
@@ -977,7 +977,7 @@
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "var_name",
             "named": true
           }
         ]
@@ -2200,7 +2200,7 @@
       "required": true,
       "types": [
         {
-          "type": "identifier",
+          "type": "var_name",
           "named": true
         }
       ]

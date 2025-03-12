@@ -151,7 +151,7 @@ module.exports = grammar({
 
         var_statement: $ => seq(
             /var/i,
-            commaSep1($.identifier),
+            commaSep1($._var_name),
             ';'
         ),
 
@@ -173,16 +173,16 @@ module.exports = grammar({
         ),
 
         assign_statement: $ => choice(
-            seq(field("name", $.identifier), '=', field("value", $.expression), ';'),
+            seq(field("name", $._var_name), '=', field("value", $.expression), ';'),
             $.increment_statement,
             $.decrement_statement,
         ),
 
         increment_statement: $ => seq(
-            '++', field("name", $.identifier), ';'
+            '++', field("name", $._var_name), ';'
         ),
         decrement_statement: $ => seq(
-            '--', field("name", $.identifier), ';'
+            '--', field("name", $._var_name), ';'
         ),
 
         return_statement: $ => seq(
@@ -368,7 +368,7 @@ module.exports = grammar({
         varying: $ => choice(
             $.rand_call,
             $.get_term,
-            prec.dynamic(1, $._var_name),
+            alias(prec.dynamic(1, $._var_name), $.var_name_term),
         ),
 
         constant: $ => choice(
