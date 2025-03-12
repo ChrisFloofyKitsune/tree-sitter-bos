@@ -135,7 +135,7 @@ piece j;
     (preproc_ifdef
         (identifier)
         (piece_declaration
-            (identifier))))
+            (piece_name))))
 
 ================================================================================
 Ifdefs 2
@@ -163,7 +163,7 @@ static-var b;
     (preproc_ifdef
         (identifier)
         (static_var_declaration
-            (identifier))
+            (var_name))
     (preproc_def
         (identifier)
         (preproc_arg))
@@ -172,7 +172,7 @@ static-var b;
             (identifier))
         (preproc_else
             (static_var_declaration
-                (identifier))
+                (var_name))
         (preproc_def
             (identifier)
             (preproc_arg)))))
@@ -207,22 +207,22 @@ piece b;
     (preproc_ifdef
         (identifier)
         (piece_declaration
-            (identifier))
+            (piece_name))
     (preproc_elifdef
         (identifier)
         (piece_declaration
-            (identifier))))
+            (piece_name))))
     (preproc_ifdef
         (identifier)
         (piece_declaration
-            (identifier))
+            (piece_name))
     (preproc_elifdef
         (identifier)
         (piece_declaration
-            (identifier))
+            (piece_name))
         (preproc_else
             (piece_declaration
-                (identifier))))))
+                (piece_name))))))
 
 ================================================================================
 Mixing #elif and #elifdef
@@ -248,24 +248,24 @@ piece c;
     (preproc_ifdef
         (identifier)
         (piece_declaration
-            (identifier))
+            (piece_name))
         (preproc_elif
             (preproc_defined
                 (identifier))
             (piece_declaration
-                (identifier))))
+                (piece_name))))
     (preproc_if
         (preproc_defined
                 (identifier))
         (piece_declaration
-            (identifier))
+            (piece_name))
         (preproc_elifdef
             (identifier)
             (piece_declaration
-                (identifier))
+                (piece_name))
             (preproc_else
                 (piece_declaration
-                    (identifier))))))
+                    (piece_name))))))
 
 ================================================================================
 General if blocks
@@ -334,7 +334,7 @@ main() {
 
 (source_file
     (function_declaration
-        (identifier)
+        (func_name)
         (compound_statement
             (preproc_if
                 (identifier)
@@ -406,4 +406,4 @@ piece a;
                     (argument_list
                         (identifier)))))
             (piece_declaration
-                    (identifier))))
+                    (piece_name))))

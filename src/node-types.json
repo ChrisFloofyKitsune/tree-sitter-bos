@@ -1,5 +1,23 @@
 [
   {
+    "type": "constant",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "degree_constant",
+        "named": true
+      },
+      {
+        "type": "linear_constant",
+        "named": true
+      },
+      {
+        "type": "number_literal",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "declaration",
     "named": true,
     "subtypes": [
@@ -26,7 +44,7 @@
         "named": true
       },
       {
-        "type": "degree_constant",
+        "type": "constant",
         "named": true
       },
       {
@@ -34,31 +52,11 @@
         "named": true
       },
       {
-        "type": "get_term",
-        "named": true
-      },
-      {
-        "type": "identifier",
-        "named": true
-      },
-      {
-        "type": "linear_constant",
-        "named": true
-      },
-      {
         "type": "macro_call_expression",
         "named": true
       },
       {
-        "type": "number_literal",
-        "named": true
-      },
-      {
         "type": "parenthesized_expression",
-        "named": true
-      },
-      {
-        "type": "rand_call",
         "named": true
       },
       {
@@ -67,6 +65,10 @@
       },
       {
         "type": "unary_expression",
+        "named": true
+      },
+      {
+        "type": "varying",
         "named": true
       }
     ]
@@ -208,6 +210,24 @@
     ]
   },
   {
+    "type": "varying",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "get_term",
+        "named": true
+      },
+      {
+        "type": "rand_call",
+        "named": true
+      },
+      {
+        "type": "var_name",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "argument_list",
     "named": true,
     "fields": {},
@@ -221,6 +241,10 @@
         },
         {
           "type": "expression",
+          "named": true
+        },
+        {
+          "type": "identifier",
           "named": true
         },
         {
@@ -283,6 +307,16 @@
             "named": true
           }
         ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "attach-unit",
+            "named": false
+          }
+        ]
       }
     }
   },
@@ -305,6 +339,10 @@
           },
           {
             "type": "expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
             "named": true
           },
           {
@@ -382,6 +420,10 @@
             "named": false
           },
           {
+            "type": "^^",
+            "named": false
+          },
+          {
             "type": "|",
             "named": false
           },
@@ -404,6 +446,10 @@
             "named": true
           },
           {
+            "type": "identifier",
+            "named": true
+          },
+          {
             "type": "preproc_defined",
             "named": true
           }
@@ -415,12 +461,22 @@
     "type": "cache_statement",
     "named": true,
     "fields": {
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "cache",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -472,8 +528,18 @@
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "func_name",
             "named": true
+          }
+        ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "call-script",
+            "named": false
           }
         ]
       }
@@ -565,12 +631,22 @@
     "type": "dont_cache_statement",
     "named": true,
     "fields": {
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "dont-cache",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -581,12 +657,22 @@
     "type": "dont_shade_statement",
     "named": true,
     "fields": {
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "dont-shade",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -597,12 +683,22 @@
     "type": "dont_shadow_statement",
     "named": true,
     "fields": {
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "dont-shadow",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -622,6 +718,16 @@
             "named": true
           }
         ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "drop-unit",
+            "named": false
+          }
+        ]
       }
     }
   },
@@ -639,12 +745,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "emit-sfx",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -665,12 +781,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "explode",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -686,7 +812,7 @@
         "required": false,
         "types": [
           {
-            "type": "identifier",
+            "type": "arg_name",
             "named": true
           }
         ]
@@ -706,7 +832,7 @@
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "func_name",
             "named": true
           }
         ]
@@ -752,6 +878,16 @@
             "named": true
           }
         ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "get",
+            "named": false
+          }
+        ]
       }
     }
   },
@@ -774,12 +910,22 @@
     "type": "hide_statement",
     "named": true,
     "fields": {
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "hide",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -937,12 +1083,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "move",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -966,6 +1122,10 @@
           "named": true
         },
         {
+          "type": "identifier",
+          "named": true
+        },
+        {
           "type": "preproc_defined",
           "named": true
         }
@@ -981,7 +1141,7 @@
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -1090,19 +1250,11 @@
             "named": true
           },
           {
-            "type": "degree_constant",
+            "type": "constant",
             "named": true
           },
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "linear_constant",
-            "named": true
-          },
-          {
-            "type": "number_literal",
             "named": true
           },
           {
@@ -1369,19 +1521,11 @@
             "named": true
           },
           {
-            "type": "degree_constant",
+            "type": "constant",
             "named": true
           },
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "linear_constant",
-            "named": true
-          },
-          {
-            "type": "number_literal",
             "named": true
           },
           {
@@ -1623,6 +1767,16 @@
             "named": true
           }
         ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "set-signal-mask",
+            "named": false
+          }
+        ]
       }
     }
   },
@@ -1639,6 +1793,16 @@
             "named": true
           }
         ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "set",
+            "named": false
+          }
+        ]
       }
     }
   },
@@ -1646,12 +1810,22 @@
     "type": "show_statement",
     "named": true,
     "fields": {
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "show",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -1671,6 +1845,16 @@
             "named": true
           }
         ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "signal",
+            "named": false
+          }
+        ]
       }
     }
   },
@@ -1685,6 +1869,16 @@
           {
             "type": "expression",
             "named": true
+          }
+        ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "sleep",
+            "named": false
           }
         ]
       }
@@ -1762,12 +1956,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "spin",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -1793,8 +1997,18 @@
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "func_name",
             "named": true
+          }
+        ]
+      },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "start-script",
+            "named": false
           }
         ]
       }
@@ -1809,7 +2023,7 @@
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "var_name",
             "named": true
           }
         ]
@@ -1840,12 +2054,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "stop-spin",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -1895,12 +2119,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "turn",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -1921,6 +2155,10 @@
           },
           {
             "type": "expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
             "named": true
           },
           {
@@ -1982,12 +2220,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "wait-for-move",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -2008,12 +2256,22 @@
           }
         ]
       },
+      "keyword": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "wait-for-turn",
+            "named": false
+          }
+        ]
+      },
       "piece": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "identifier",
+            "type": "piece_name",
             "named": true
           }
         ]
@@ -2207,6 +2465,26 @@
     "named": false
   },
   {
+    "type": "^^",
+    "named": false
+  },
+  {
+    "type": "arg_name",
+    "named": true
+  },
+  {
+    "type": "attach-unit",
+    "named": false
+  },
+  {
+    "type": "cache",
+    "named": false
+  },
+  {
+    "type": "call-script",
+    "named": false
+  },
+  {
     "type": "comment",
     "named": true,
     "extra": true
@@ -2216,19 +2494,63 @@
     "named": false
   },
   {
+    "type": "dont-cache",
+    "named": false
+  },
+  {
+    "type": "dont-shade",
+    "named": false
+  },
+  {
+    "type": "dont-shadow",
+    "named": false
+  },
+  {
+    "type": "drop-unit",
+    "named": false
+  },
+  {
+    "type": "emit-sfx",
+    "named": false
+  },
+  {
     "type": "escape_sequence",
     "named": true
+  },
+  {
+    "type": "explode",
+    "named": false
   },
   {
     "type": "false",
     "named": true
   },
   {
+    "type": "func_name",
+    "named": true
+  },
+  {
+    "type": "get",
+    "named": false
+  },
+  {
+    "type": "hide",
+    "named": false
+  },
+  {
     "type": "identifier",
     "named": true
   },
   {
+    "type": "move",
+    "named": false
+  },
+  {
     "type": "number_literal",
+    "named": true
+  },
+  {
+    "type": "piece_name",
     "named": true
   },
   {
@@ -2238,6 +2560,38 @@
   {
     "type": "preproc_directive",
     "named": true
+  },
+  {
+    "type": "set",
+    "named": false
+  },
+  {
+    "type": "set-signal-mask",
+    "named": false
+  },
+  {
+    "type": "show",
+    "named": false
+  },
+  {
+    "type": "signal",
+    "named": false
+  },
+  {
+    "type": "sleep",
+    "named": false
+  },
+  {
+    "type": "spin",
+    "named": false
+  },
+  {
+    "type": "start-script",
+    "named": false
+  },
+  {
+    "type": "stop-spin",
+    "named": false
   },
   {
     "type": "string_content",
@@ -2250,6 +2604,22 @@
   {
     "type": "true",
     "named": true
+  },
+  {
+    "type": "turn",
+    "named": false
+  },
+  {
+    "type": "var_name",
+    "named": true
+  },
+  {
+    "type": "wait-for-move",
+    "named": false
+  },
+  {
+    "type": "wait-for-turn",
+    "named": false
   },
   {
     "type": "{",

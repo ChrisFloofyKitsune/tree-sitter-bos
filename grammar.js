@@ -24,8 +24,10 @@ function kw(keyword, ...rules) {
         return field(`argument`, rule);
     });
 
+    let kw_regex = new RegExp(keyword.replaceAll('-', '-?'), 'i');
+
     return prec(PREC.CALL + 1, seq(
-        field('keyword', prec(3, token(keyword))),
+        field('keyword', alias(kw_regex, keyword)),
         ...argRules,
         ';'
     ));
@@ -39,7 +41,7 @@ module.exports = grammar({
     conflicts: $ => [
         [$._block_item, $.statement],
         [$.get_call],
-        [$._varying, $.preproc_call_expression]
+        [$.varying, $.preproc_call_expression]
     ],
 
     extras: $ => [
@@ -50,6 +52,10 @@ module.exports = grammar({
     inline: $ => [
         $._expression_not_binary,
         $.speed_or_now,
+        $._var_name,
+        $._piece_name,
+        $._func_name,
+        $._arg_name,
     ],
 
     supertypes: $ => [
@@ -57,6 +63,8 @@ module.exports = grammar({
         $.statement,
         $.keyword_statement,
         $.declaration,
+        $.constant,
+        $.varying,
     ],
 
     rules: {
@@ -108,19 +116,19 @@ module.exports = grammar({
 
         piece_declaration: $ => prec(10, seq(
             /piece/i,
-            commaSep1(field("name", $.identifier)),
+            commaSep1(field("name", $._piece_name)),
             ';'
         )),
 
         static_var_declaration: $ => prec(10, seq(
             /static-?var/i,
-            commaSep1(field('name', $.identifier)),
+            commaSep1(field('name', $._var_name)),
             ';'
         )),
 
         function_declaration: $ => prec(10, seq(
-            field("name", $.identifier),
-            choice('()', seq('(', commaSep1(field("arg", $.identifier)), ')')),
+            field("name", $._func_name),
+            choice('()', seq('(', commaSep1(field("arg", $._arg_name)), ')')),
             field("body", $.compound_statement),
         )),
 
@@ -231,51 +239,51 @@ module.exports = grammar({
         ),
 
         call_script_statement: $ => choice(
-            kw(/call-?script/i, field('function', $.identifier), field('arguments', $.argument_list))
+            kw('call-script', field('function', $._func_name), field('arguments', $.argument_list))
         ),
         start_script_statement: $ => choice(
-            kw(/start-?script/i, field('function', $.identifier), field('arguments', $.argument_list)),
+            kw('start-script', field('function', $._func_name), field('arguments', $.argument_list)),
         ),
-        signal_statement: $ => kw(/signal/i, $.expression),
+        signal_statement: $ => kw('signal', $.expression),
 
-        set_signal_mask_statement: $ => kw(/set-?signal-?mask/i, $.expression),
-        sleep_statement: $ => kw(/sleep/i, $.expression),
+        set_signal_mask_statement: $ => kw('set-signal-mask', $.expression),
+        sleep_statement: $ => kw('sleep', $.expression),
 
-        set_statement: $ => kw(/set/i, $.expression, /to/i, $.expression),
+        set_statement: $ => kw('set', $.expression, /to/i, $.expression),
 
-        get_statement: $ => kw(/get/i, field('call', $.get_call)),
+        get_statement: $ => kw('get', field('call', $.get_call)),
         spin_statement: $ => kw(
-            /spin/i, field('piece', $.identifier), /around/i, field('axis', $.axis), /speed/i, $.expression,
+            'spin', field('piece', $._piece_name), /around/i, field('axis', $.axis), /speed/i, $.expression,
             optional(seq(/accelerate/i, $.expression))
         ),
 
         stop_spin_statement: $ => kw(
-            /stop-?spin/i, field('piece', $.identifier), /around/i, field('axis', $.axis),
+            'stop-spin', field('piece', $._piece_name), /around/i, field('axis', $.axis),
             optional(seq(/decelerate/i, $.expression))
         ),
         speed_or_now: $ => choice(/now/i, seq(/speed/i, $.expression)),
 
-        turn_statement: $ => kw(/turn/i, field('piece', $.identifier), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
-        move_statement: $ => kw(/move/i, field('piece', $.identifier), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
-        wait_for_turn_statement: $ => kw(/wait-?for-?turn/i, field('piece', $.identifier), /around/i, field('axis', $.axis),),
+        turn_statement: $ => kw('turn', field('piece', $._piece_name), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
+        move_statement: $ => kw('move', field('piece', $._piece_name), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
+        wait_for_turn_statement: $ => kw('wait-for-turn', field('piece', $._piece_name), /around/i, field('axis', $.axis),),
 
-        wait_for_move_statement: $ => kw(/wait-?for-?move/i, field('piece', $.identifier), /along/i, field('axis', $.axis),),
-        hide_statement: $ => kw(/hide/i, field('piece', $.identifier)),
+        wait_for_move_statement: $ => kw('wait-for-move', field('piece', $._piece_name), /along/i, field('axis', $.axis),),
+        hide_statement: $ => kw('hide', field('piece', $._piece_name)),
 
-        show_statement: $ => kw(/show/i, field('piece', $.identifier)),
-        emit_sfx_statement: $ => kw(/emit-?sfx/i, $.expression, /from/i, field('piece', $.identifier)),
+        show_statement: $ => kw('show', field('piece', $._piece_name)),
+        emit_sfx_statement: $ => kw('emit-sfx', $.expression, /from/i, field('piece', $._piece_name)),
 
         // play_sound_statement: $ => undefined,
-        explode_statement: $ => kw(/explode/i, field('piece', $.identifier), /type/i, $.expression),
+        explode_statement: $ => kw('explode', field('piece', $._piece_name), /type/i, $.expression),
 
-        attach_unit_statement: $ => kw(/attach-?unit/i, $.expression, /to/i, $.expression),
-        drop_unit_statement: $ => kw(/drop-?unit/i, $.expression),
+        attach_unit_statement: $ => kw('attach-unit', $.expression, /to/i, $.expression),
+        drop_unit_statement: $ => kw('drop-unit', $.expression),
 
-        cache_statement: $ => kw(/cache/i, field('piece', $.identifier)),
-        dont_cache_statement: $ => kw(/dont-?cache/i, field('piece', $.identifier)),
-        shade_statement: $ => kw(/shade/i, field('piece', $.identifier)),
-        dont_shade_statement: $ => kw(/dont-?shade/i, field('piece', $.identifier)),
-        dont_shadow_statement: $ => kw(/dont-?shadow/i, field('piece', $.identifier)),
+        cache_statement: $ => kw('cache', field('piece', $._piece_name)),
+        dont_cache_statement: $ => kw('dont-cache', field('piece', $._piece_name)),
+        shade_statement: $ => kw('shade', field('piece', $._piece_name)),
+        dont_shade_statement: $ => kw('dont-shade', field('piece', $._piece_name)),
+        dont_shadow_statement: $ => kw('dont-shadow', field('piece', $._piece_name)),
 
         expression: $ => choice(
             $._expression_not_binary,
@@ -285,8 +293,8 @@ module.exports = grammar({
         _expression_not_binary: $ => choice(
             $.parenthesized_expression,
             $._macro_call_expression,
-            $._constant,
-            $._varying,
+            $.constant,
+            $.varying,
             $.unary_expression,
             $.true,
             $.false,
@@ -310,10 +318,11 @@ module.exports = grammar({
                 ['*', PREC.MULTIPLY],
                 ['/', PREC.MULTIPLY],
                 ['%', PREC.MULTIPLY],
+                [alias(choice('^^', /xor/i), '^^'), PREC.LOGICAL_XOR],
                 [alias(choice('||', /or/i), '||'), PREC.LOGICAL_OR],
                 [alias(choice('&&', /and/i), '&&'), PREC.LOGICAL_AND],
-                ['|', PREC.INCLUSIVE_OR],
                 ['^', PREC.EXCLUSIVE_OR],
+                ['|', PREC.INCLUSIVE_OR],
                 ['&', PREC.BITWISE_AND],
                 ['==', PREC.EQUAL],
                 ['!=', PREC.EQUAL],
@@ -356,13 +365,13 @@ module.exports = grammar({
             ),
         ),
 
-        _varying: $ => choice(
+        varying: $ => choice(
             $.rand_call,
             $.get_term,
-            prec.dynamic(1, $.identifier),
+            prec.dynamic(1, $._var_name),
         ),
 
-        _constant: $ => choice(
+        constant: $ => choice(
             $.linear_constant,
             $.degree_constant,
             $.number_literal,
@@ -372,6 +381,11 @@ module.exports = grammar({
 
         degree_constant: $ => seq('<', choice($.number_literal, $.identifier), '>'),
         identifier: $ => /[a-z_][a-z_0-9]*/i,
+
+        _var_name: $ => alias($.identifier, $.var_name),
+        _piece_name: $ => alias($.identifier, $.piece_name),
+        _func_name: $ => alias($.identifier, $.func_name),
+        _arg_name: $ => alias($.identifier, $.arg_name),
 
         ...c_rules,
 

@@ -22,20 +22,20 @@ function() {
 
 (source_file
     (function_declaration
-        name: (identifier)
+        name: (func_name)
         body: (compound_statement
             (call_script_statement
-                function: (identifier)
+                function: (func_name)
                 arguments: (argument_list))
             (call_script_statement
-                function: (identifier)
+                function: (func_name)
                 arguments: (argument_list
                     (number_literal)))
             (start_script_statement
-                function: (identifier)
+                function: (func_name)
                 arguments: (argument_list))
             (start_script_statement
-                function: (identifier)
+                function: (func_name)
                 arguments: (argument_list))
             (signal_statement
                 argument: (number_literal))
@@ -46,7 +46,7 @@ function() {
             (sleep_statement
                 argument: (number_literal))
             (set_statement
-                argument: (identifier)
+                argument: (var_name)
                 argument: (number_literal)))))
 
 ====================
@@ -76,53 +76,53 @@ function() {
 
 (source_file
     (function_declaration
-        name: (identifier)
+        name: (func_name)
         body: (compound_statement
             (spin_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis)
                 argument: (degree_constant
                     (number_literal)))
             (spin_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis)
                 argument: (degree_constant
                     (number_literal))
                 argument: (degree_constant
                     (number_literal)))
             (stop_spin_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis))
             (turn_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis)
                 argument: (degree_constant
                     (number_literal))
                 argument: (degree_constant
                     (number_literal)))
             (move_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis)
                 argument: (linear_constant
                     (number_literal))
                 argument: (linear_constant
                     (number_literal)))
             (wait_for_turn_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis))
             (wait_for_turn_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis))
             (wait_for_move_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis))
             (wait_for_move_statement
-                piece: (identifier)
+                piece: (piece_name)
                 axis: (axis))
             (hide_statement
-                piece: (identifier))
+                piece: (piece_name))
             (show_statement
-                piece: (identifier)))))
+                piece: (piece_name)))))
 
 ==========================
 special effects statements
@@ -145,65 +145,65 @@ function() {
 
 (source_file
     (function_declaration
-        name: (identifier)
+        name: (func_name)
         body: (compound_statement
             (emit_sfx_statement
                 argument: (binary_expression
                     left: (number_literal)
                     right: (number_literal))
-                piece: (identifier))
+                piece: (piece_name))
             (emit_sfx_statement
                 argument: (binary_expression
                     left: (number_literal)
                     right: (number_literal))
-                piece: (identifier))
+                piece: (piece_name))
             (emit_sfx_statement
-                argument: (identifier)
-                piece: (identifier))
+                argument: (var_name)
+                piece: (piece_name))
             (emit_sfx_statement
-                argument: (identifier)
-                piece: (identifier))
+                argument: (var_name)
+                piece: (piece_name))
             (explode_statement
-                piece: (identifier)
+                piece: (piece_name)
                 argument: (binary_expression
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (identifier)
-                                right: (identifier))
-                            right: (identifier))
-                        right: (identifier))
-                    right: (identifier)))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name)))
             (explode_statement
-                piece: (identifier)
+                piece: (piece_name)
                 argument: (binary_expression
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (identifier)
-                                right: (identifier))
-                            right: (identifier))
-                        right: (identifier))
-                    right: (identifier)))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name)))
             (explode_statement
-                piece: (identifier)
+                piece: (piece_name)
                 argument: (binary_expression
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (identifier)
-                                right: (identifier))
-                            right: (identifier))
-                        right: (identifier))
-                    right: (identifier)))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name)))
             (explode_statement
-                piece: (identifier)
+                piece: (piece_name)
                 argument: (binary_expression
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (identifier)
-                                right: (identifier))
-                            right: (identifier))
-                        right: (identifier))
-                    right: (identifier))))))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name))))))
