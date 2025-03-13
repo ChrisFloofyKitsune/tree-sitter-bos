@@ -56,10 +56,12 @@ module.exports = grammar({
         $._piece_name,
         $._func_name,
         $._arg_name,
+        $._define_name,
     ],
 
     supertypes: $ => [
         $.expression,
+        $.preproc_expression,
         $.statement,
         $.keyword_statement,
         $.declaration,
@@ -72,32 +74,34 @@ module.exports = grammar({
 
         _top_level_item: $ => choice(
             $.declaration,
-            $.macro_name_statement,
-            $.macro_call_statement,
             alias($.preproc_if_top_level, $.preproc_if),
             alias($.preproc_ifdef_top_level, $.preproc_ifdef),
+            $.macro_name_statement,
+            $.macro_call_statement,
             $.preproc_include,
             $.preproc_def,
             $.preproc_function_def,
-            $.preproc_call,
+            $.preproc_undef,
+            $.preproc_directive,
             ';',
         ),
 
         _block_item: $ => choice(
             $.statement,
-            $.macro_name_statement,
-            $.macro_call_statement,
             $.preproc_if,
             $.preproc_ifdef,
+            $.macro_name_statement,
+            $.macro_call_statement,
             $.preproc_include,
             $.preproc_def,
             $.preproc_function_def,
-            $.preproc_call,
+            $.preproc_undef,
+            $.preproc_directive,
             ';',
         ),
 
         macro_name_statement: $ => seq(
-            $.identifier,
+            $._define_name,
             optional(';'),
             token.immediate(/\r?\n/),
         ),
@@ -368,7 +372,7 @@ module.exports = grammar({
         varying: $ => choice(
             $.rand_call,
             $.get_term,
-            alias(prec.dynamic(1, $._var_name), $.var_name_term),
+            prec.dynamic(1, $._var_name),
         ),
 
         constant: $ => choice(
@@ -386,6 +390,7 @@ module.exports = grammar({
         _piece_name: $ => alias($.identifier, $.piece_name),
         _func_name: $ => alias($.identifier, $.func_name),
         _arg_name: $ => alias($.identifier, $.arg_name),
+        _define_name: $ => alias($.identifier, $.define_name),
 
         ...c_rules,
 

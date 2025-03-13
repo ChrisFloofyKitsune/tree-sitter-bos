@@ -46,7 +46,7 @@ function() {
             (sleep_statement
                 argument: (number_literal))
             (set_statement
-                argument: (var_name_term)
+                argument: (var_name)
                 argument: (number_literal)))))
 
 ====================
@@ -158,10 +158,10 @@ function() {
                     right: (number_literal))
                 piece: (piece_name))
             (emit_sfx_statement
-                argument: (var_name_term)
+                argument: (var_name)
                 piece: (piece_name))
             (emit_sfx_statement
-                argument: (var_name_term)
+                argument: (var_name)
                 piece: (piece_name))
             (explode_statement
                 piece: (piece_name)
@@ -169,41 +169,41 @@ function() {
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (var_name_term)
-                                right: (var_name_term))
-                            right: (var_name_term))
-                        right: (var_name_term))
-                    right: (var_name_term)))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name)))
             (explode_statement
                 piece: (piece_name)
                 argument: (binary_expression
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (var_name_term)
-                                right: (var_name_term))
-                            right: (var_name_term))
-                        right: (var_name_term))
-                    right: (var_name_term)))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name)))
             (explode_statement
                 piece: (piece_name)
                 argument: (binary_expression
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (var_name_term)
-                                right: (var_name_term))
-                            right: (var_name_term))
-                        right: (var_name_term))
-                    right: (var_name_term)))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name)))
             (explode_statement
                 piece: (piece_name)
                 argument: (binary_expression
                     left: (binary_expression
                         left: (binary_expression
                             left: (binary_expression
-                                left: (var_name_term)
-                                right: (var_name_term))
-                            right: (var_name_term))
-                        right: (var_name_term))
-                    right: (var_name_term))))))
+                                left: (var_name)
+                                right: (var_name))
+                            right: (var_name))
+                        right: (var_name))
+                    right: (var_name))))))

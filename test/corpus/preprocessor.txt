@@ -16,13 +16,13 @@ Include directives
     (preproc_include
         (system_lib_string))
     (preproc_include
-        (identifier))
+        (define_name))
     (preproc_include
-        (call_expression
-            (identifier)
-            (argument_list
-                (identifier)
-                (identifier)))))
+        (preproc_call_expression
+            (define_name)
+            (preproc_argument_list
+                (define_name)
+                (define_name)))))
 
 ================================================================================
 Object-like macro definitions
@@ -51,34 +51,41 @@ Object-like macro definitions
 
 (source_file
     (preproc_def
-        (identifier))
+        (define_name))
+
     (preproc_def
-        (identifier)
+        (define_name)
         (preproc_arg))
+
     (preproc_def
-        (identifier)
+        (define_name)
         (preproc_arg))
+
     (preproc_def
-        (identifier)
+        (define_name)
         (preproc_arg))
+
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params
             (identifier)
             (identifier))
         (preproc_arg))
+
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params
             (identifier)
             (identifier))
         (preproc_arg))
+
     (preproc_def
-        (identifier)
+        (define_name)
         (preproc_arg)
         (comment))
+
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params
             (identifier))
         (preproc_arg)))
@@ -97,26 +104,26 @@ Function-like macro definitions
 
 (source_file
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params)
         (preproc_arg))
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params
             (identifier))
         (preproc_arg))
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params
             (identifier)
             (identifier))
         (preproc_arg))
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params)
         (preproc_arg))
     (preproc_function_def
-        (identifier)
+        (define_name)
         (preproc_params
             (identifier)
             (identifier))
@@ -133,7 +140,7 @@ piece j;
 --------------------------------------------------------------------------------
 (source_file
     (preproc_ifdef
-        (identifier)
+        (define_name)
         (piece_declaration
             (piece_name))))
 
@@ -161,26 +168,26 @@ static-var b;
 
 (source_file
     (preproc_ifdef
-        (identifier)
+        (define_name)
         (static_var_declaration
             (var_name))
     (preproc_def
-        (identifier)
+        (define_name)
         (preproc_arg))
         (preproc_elif
             (preproc_defined
-            (identifier))
+            (define_name))
         (preproc_else
             (static_var_declaration
                 (var_name))
         (preproc_def
-            (identifier)
+            (define_name)
             (preproc_arg)))))
     (preproc_ifdef
-        (identifier)
+        (define_name)
         (preproc_else
             (preproc_ifdef
-                (identifier)
+                (define_name)
                 (preproc_else)))))
 
 ================================================================================
@@ -205,19 +212,19 @@ piece b;
 
 (source_file
     (preproc_ifdef
-        (identifier)
+        (define_name)
         (piece_declaration
             (piece_name))
     (preproc_elifdef
-        (identifier)
+        (define_name)
         (piece_declaration
             (piece_name))))
     (preproc_ifdef
-        (identifier)
+        (define_name)
         (piece_declaration
             (piece_name))
     (preproc_elifdef
-        (identifier)
+        (define_name)
         (piece_declaration
             (piece_name))
         (preproc_else
@@ -246,21 +253,21 @@ piece c;
 
 (source_file
     (preproc_ifdef
-        (identifier)
+        (define_name)
         (piece_declaration
             (piece_name))
         (preproc_elif
             (preproc_defined
-                (identifier))
+                (define_name))
             (piece_declaration
                 (piece_name))))
     (preproc_if
         (preproc_defined
-                (identifier))
+                (define_name))
         (piece_declaration
             (piece_name))
         (preproc_elifdef
-            (identifier)
+            (define_name)
             (piece_declaration
                 (piece_name))
             (preproc_else
@@ -285,25 +292,25 @@ General if blocks
 
 (source_file
     (preproc_if
-        (binary_expression
+        (preproc_binary_expression
             (preproc_defined
-                (identifier))
+                (define_name))
             (preproc_defined
-                (identifier)))
+                (define_name)))
         (preproc_def
-            (identifier)
+            (define_name)
             (preproc_arg))
         (preproc_elif
             (preproc_defined
-                (identifier))
+                (define_name))
             (preproc_def
-                (identifier))
+                (define_name))
             (preproc_elif
-                (unary_expression
+                (preproc_unary_expression
                     (preproc_defined
-                        (identifier)))
+                        (define_name)))
                 (preproc_def
-                    (identifier))
+                    (define_name))
                 (preproc_else
                     (preproc_include
                         (system_lib_string)))))))
@@ -337,28 +344,28 @@ main() {
         (func_name)
         (compound_statement
             (preproc_if
-                (identifier)
+                (define_name)
                 (macro_call_statement
                     (macro_call_expression
-                        (identifier)
-                        (argument_list
+                        (define_name)
+                        (preproc_argument_list
                             (number_literal))))
                 (preproc_else
                     (macro_call_statement
                     (macro_call_expression
-                        (identifier)
-                        (argument_list
+                        (define_name)
+                        (preproc_argument_list
                             (number_literal))))))
         (preproc_if
-            (identifier)
+            (define_name)
             (return_statement
                 (number_literal))
             (preproc_elif
-                (identifier)
+                (define_name)
                 (return_statement
                     (number_literal))
                 (preproc_elif
-                    (identifier)
+                    (define_name)
                     (return_statement
                         (number_literal))
                     (preproc_else
@@ -374,8 +381,8 @@ Unknown preprocessor directives
 --------------------------------------------------------------------------------
 
 (source_file
-    (preproc_call
-        (preproc_directive)
+    (preproc_directive
+        (preproc_directive_name)
         (preproc_arg)))
 
 ================================================================================
@@ -393,17 +400,17 @@ piece a;
 
 (source_file
     (preproc_if
-        (binary_expression
-            (call_expression
-                (identifier)
-                (argument_list
-                    (binary_expression
-                        (identifier)
-                        (identifier))))
-            (unary_expression
-                (call_expression
-                    (identifier)
-                    (argument_list
-                        (identifier)))))
+        (preproc_binary_expression
+            (preproc_call_expression
+                (define_name)
+                (preproc_argument_list
+                    (preproc_binary_expression
+                        (define_name)
+                        (define_name))))
+            (preproc_unary_expression
+                (preproc_call_expression
+                    (define_name)
+                    (preproc_argument_list
+                        (define_name)))))
             (piece_declaration
                     (piece_name))))

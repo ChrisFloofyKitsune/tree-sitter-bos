@@ -22,10 +22,10 @@ function() {
             (comment)
             (get_statement
                 (get_call
-                    (var_name_term)))
+                    (var_name)))
             (get_statement
                 (get_call
-                    (var_name_term)
+                    (var_name)
                     (number_literal)
                     (number_literal)
                     (number_literal)
@@ -54,7 +54,7 @@ function() {
             (compound_statement
                 (get_statement
                     (get_call
-                        (var_name_term)
+                        (var_name)
                         (number_literal)))
             (get_statement
                 (get_call
@@ -68,28 +68,29 @@ function() {
                             (number_literal)))
                     (binary_expression
                         (number_literal)
-                        (var_name_term))))
+                        (var_name))))
             (macro_call_statement
                 (macro_call_expression
-                    (identifier)
-                    (argument_list (number_literal))))
+                    (define_name)
+                    (preproc_argument_list
+                        (number_literal))))
             (get_statement
                 (get_call
                     (macro_call_expression
-                        (identifier)
-                        (argument_list
+                        (define_name)
+                        (preproc_argument_list
                             (number_literal)))
                     (degree_constant
                         (number_literal))))
             (get_statement
                 (get_call
                     (macro_call_expression
-                        (identifier)
-                        (argument_list
+                        (define_name)
+                        (preproc_argument_list
                             (number_literal)))
                     (get_term
                         (get_call
-                            (var_name_term)
+                            (var_name)
                             (number_literal))))))))
 
 ================
@@ -110,21 +111,23 @@ function() {
         (compound_statement
             (if_statement
                 (binary_expression
-                    (var_name_term)
+                    (var_name)
                     (binary_expression
                         (get_term
                             (get_call
                                 (macro_call_expression
-                                    (identifier)
-                                    (argument_list (number_literal)))
-                            (var_name_term)))
+                                    (define_name)
+                                    (preproc_argument_list
+                                        (number_literal)))
+                            (var_name)))
                         (get_term
                             (get_call
                                 (macro_call_expression
-                                    (identifier)
-                                    (argument_list (number_literal)))
+                                    (define_name)
+                                    (preproc_argument_list
+                                        (number_literal)))
                             (get_term
                                 (get_call
-                                    (var_name_term)
+                                    (var_name)
                                     (number_literal)))))))
                 (compound_statement)))))
