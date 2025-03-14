@@ -22,10 +22,10 @@ function() {
             (comment)
             (get_statement
                 (get_call
-                    (var_name)))
+                    (var_name_term)))
             (get_statement
                 (get_call
-                    (var_name)
+                    (var_name_term)
                     (number_literal)
                     (number_literal)
                     (number_literal)
@@ -54,7 +54,7 @@ function() {
             (compound_statement
                 (get_statement
                     (get_call
-                        (var_name)
+                        (var_name_term)
                         (number_literal)))
             (get_statement
                 (get_call
@@ -68,7 +68,7 @@ function() {
                             (number_literal)))
                     (binary_expression
                         (number_literal)
-                        (var_name))))
+                        (var_name_term))))
             (macro_call_statement
                 (macro_call_expression
                     (define_name)
@@ -90,7 +90,7 @@ function() {
                             (number_literal)))
                     (get_term
                         (get_call
-                            (var_name)
+                            (var_name_term)
                             (number_literal))))))))
 
 ================
@@ -111,7 +111,7 @@ function() {
         (compound_statement
             (if_statement
                 (binary_expression
-                    (var_name)
+                    (var_name_term)
                     (binary_expression
                         (get_term
                             (get_call
@@ -119,7 +119,7 @@ function() {
                                     (define_name)
                                     (preproc_argument_list
                                         (number_literal)))
-                            (var_name)))
+                            (var_name_term)))
                         (get_term
                             (get_call
                                 (macro_call_expression
@@ -128,6 +128,6 @@ function() {
                                         (number_literal)))
                             (get_term
                                 (get_call
-                                    (var_name)
+                                    (var_name_term)
                                     (number_literal)))))))
                 (compound_statement)))))

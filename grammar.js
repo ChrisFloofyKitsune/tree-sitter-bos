@@ -3,7 +3,7 @@
  * @author ChrisFloofyKitsune <chrisfloofykitsune@gmail.com>
  * @license GPL-2.0
  */
-const {PREC, c_rules, commaSep1, preprocIf, commaSep} = require("./c_grammar");
+const {PREC, c_rules, commaSep1, preprocIf, commaSep, preprocessor} = require("./c_grammar");
 
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
@@ -32,6 +32,17 @@ function kw(keyword, ...rules) {
         ';'
     ));
 }
+
+const commonPreprocNodes = ($) => [
+    $.macro_name_statement,
+    $.macro_call_statement,
+    $.preproc_include,
+    $.preproc_def,
+    $.preproc_function_def,
+    $.preproc_undef,
+    $.preproc_line,
+    $.preproc_directive,
+]
 
 module.exports = grammar({
     name: "bos",
@@ -76,13 +87,7 @@ module.exports = grammar({
             $.declaration,
             alias($.preproc_if_top_level, $.preproc_if),
             alias($.preproc_ifdef_top_level, $.preproc_ifdef),
-            $.macro_name_statement,
-            $.macro_call_statement,
-            $.preproc_include,
-            $.preproc_def,
-            $.preproc_function_def,
-            $.preproc_undef,
-            $.preproc_directive,
+            ...commonPreprocNodes($),
             ';',
         ),
 
@@ -90,13 +95,7 @@ module.exports = grammar({
             $.statement,
             $.preproc_if,
             $.preproc_ifdef,
-            $.macro_name_statement,
-            $.macro_call_statement,
-            $.preproc_include,
-            $.preproc_def,
-            $.preproc_function_def,
-            $.preproc_undef,
-            $.preproc_directive,
+            ...commonPreprocNodes($),
             ';',
         ),
 
@@ -311,7 +310,7 @@ module.exports = grammar({
         get_term: $ => seq(/get/i, $.get_call),
 
         unary_expression: $ => prec.left(PREC.UNARY, seq(
-            field('operator', choice('!', /not/i)),
+            field('operator', alias(choice('!', /not/i), '!')),
             field('argument', $.expression),
         )),
 
@@ -369,10 +368,11 @@ module.exports = grammar({
             ),
         ),
 
+
         varying: $ => choice(
             $.rand_call,
             $.get_term,
-            prec.dynamic(1, $._var_name),
+            prec.dynamic(1, alias($._var_name, $.var_name_term)),
         ),
 
         constant: $ => choice(
@@ -384,7 +384,7 @@ module.exports = grammar({
         linear_constant: $ => seq('[', choice($.number_literal, $.identifier), ']'),
 
         degree_constant: $ => seq('<', choice($.number_literal, $.identifier), '>'),
-        identifier: $ => /[a-z_][a-z_0-9]*/i,
+        identifier: _ => /[a-z_][a-z_0-9]*/i,
 
         _var_name: $ => alias($.identifier, $.var_name),
         _piece_name: $ => alias($.identifier, $.piece_name),
@@ -396,5 +396,12 @@ module.exports = grammar({
 
         ...preprocIf("", $ => $._block_item),
         ...preprocIf("_top_level", $ => $._top_level_item),
+
+        preproc_line: $ => seq(
+            preprocessor('line'),
+            field('lineno', $.number_literal),
+            optional(field('filename', $.string_literal)),
+            token.immediate(/\r?\n/),
+        )
     }
 });

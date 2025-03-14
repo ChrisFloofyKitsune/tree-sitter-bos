@@ -82,7 +82,7 @@ module.exports.c_rules = {
     ),
 
     preproc_params: $ => seq(
-        token.immediate('('), commaSep(choice($.identifier, field('ellipsis', '...'))), ')',
+        token.immediate('('), commaSep(choice($.identifier, '...')), ')',
     ),
 
     preproc_undef: $ => seq(
@@ -127,7 +127,7 @@ module.exports.c_rules = {
     ),
 
     preproc_unary_expression: $ => prec.left(PREC.UNARY, seq(
-        field('operator', choice('!', '~', '-', '+')),
+        field('operator', choice(alias(choice('!', /not/i), '!'), '~', '-', '+')),
         field('argument', $.preproc_expression),
     )),
 
@@ -263,7 +263,7 @@ function preprocIf(suffix, content, precedence = 0) {
             preprocessor('if'),
             field('condition', $.preproc_expression),
             '\n',
-            repeat(content($)),
+            field('body', repeat(content($))),
             field('alternative', optional(alternativeBlock($))),
             preprocessor('endif'),
         )),
@@ -271,28 +271,28 @@ function preprocIf(suffix, content, precedence = 0) {
         ['preproc_ifdef' + suffix]: $ => prec(precedence, seq(
             choice(preprocessor('ifdef'), preprocessor('ifndef')),
             field('name', $._define_name),
-            repeat(content($)),
+            field('body', repeat(content($))),
             field('alternative', optional(alternativeBlock($))),
             preprocessor('endif'),
         )),
 
         ['preproc_else' + suffix]: $ => prec(precedence, seq(
             preprocessor('else'),
-            repeat(content($)),
+            field('body', repeat(content($))),
         )),
 
         ['preproc_elif' + suffix]: $ => prec(precedence, seq(
             preprocessor('elif'),
             field('condition', $.preproc_expression),
             '\n',
-            repeat(content($)),
+            field('body', repeat(content($))),
             field('alternative', optional(alternativeBlock($))),
         )),
 
         ['preproc_elifdef' + suffix]: $ => prec(precedence, seq(
             choice(preprocessor('elifdef'), preprocessor('elifndef')),
             field('name', $._define_name),
-            repeat(content($)),
+            field('body', repeat(content($))),
             field('alternative', optional(alternativeBlock($))),
         )),
     };
