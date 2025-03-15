@@ -426,6 +426,18 @@
             "named": false
           },
           {
+            "type": "and",
+            "named": false
+          },
+          {
+            "type": "or",
+            "named": false
+          },
+          {
+            "type": "xor",
+            "named": false
+          },
+          {
             "type": "|",
             "named": false
           },
@@ -1042,6 +1054,14 @@
           {
             "type": "expression",
             "named": true
+          },
+          {
+            "type": "now",
+            "named": false
+          },
+          {
+            "type": "speed",
+            "named": false
           }
         ]
       },
@@ -2142,6 +2162,10 @@
         "required": true,
         "types": [
           {
+            "type": "accelerate",
+            "named": false
+          },
+          {
             "type": "expression",
             "named": true
           }
@@ -2240,6 +2264,10 @@
         "required": false,
         "types": [
           {
+            "type": "decelerate",
+            "named": false
+          },
+          {
             "type": "expression",
             "named": true
           }
@@ -2307,6 +2335,14 @@
           {
             "type": "expression",
             "named": true
+          },
+          {
+            "type": "now",
+            "named": false
+          },
+          {
+            "type": "speed",
+            "named": false
           }
         ]
       },
@@ -2362,6 +2398,10 @@
         "types": [
           {
             "type": "!",
+            "named": false
+          },
+          {
+            "type": "not",
             "named": false
           }
         ]
@@ -2654,8 +2694,24 @@
     "named": false
   },
   {
+    "type": "accelerate",
+    "named": false
+  },
+  {
+    "type": "along",
+    "named": false
+  },
+  {
+    "type": "and",
+    "named": false
+  },
+  {
     "type": "arg_name",
     "named": true
+  },
+  {
+    "type": "around",
+    "named": false
   },
   {
     "type": "attach-unit",
@@ -2673,6 +2729,10 @@
     "type": "comment",
     "named": true,
     "extra": true
+  },
+  {
+    "type": "decelerate",
+    "named": false
   },
   {
     "type": "define_name",
@@ -2699,6 +2759,10 @@
     "named": false
   },
   {
+    "type": "else",
+    "named": false
+  },
+  {
     "type": "emit-sfx",
     "named": false
   },
@@ -2713,6 +2777,10 @@
   {
     "type": "false",
     "named": true
+  },
+  {
+    "type": "from",
+    "named": false
   },
   {
     "type": "func_name",
@@ -2731,12 +2799,32 @@
     "named": true
   },
   {
+    "type": "if",
+    "named": false
+  },
+  {
     "type": "move",
+    "named": false
+  },
+  {
+    "type": "not",
+    "named": false
+  },
+  {
+    "type": "now",
     "named": false
   },
   {
     "type": "number_literal",
     "named": true
+  },
+  {
+    "type": "or",
+    "named": false
+  },
+  {
+    "type": "piece",
+    "named": false
   },
   {
     "type": "piece_name",
@@ -2749,6 +2837,14 @@
   {
     "type": "preproc_directive_name",
     "named": true
+  },
+  {
+    "type": "rand",
+    "named": false
+  },
+  {
+    "type": "return",
+    "named": false
   },
   {
     "type": "set",
@@ -2771,11 +2867,19 @@
     "named": false
   },
   {
+    "type": "speed",
+    "named": false
+  },
+  {
     "type": "spin",
     "named": false
   },
   {
     "type": "start-script",
+    "named": false
+  },
+  {
+    "type": "static-var",
     "named": false
   },
   {
@@ -2791,11 +2895,23 @@
     "named": true
   },
   {
+    "type": "to",
+    "named": false
+  },
+  {
     "type": "true",
     "named": true
   },
   {
     "type": "turn",
+    "named": false
+  },
+  {
+    "type": "type",
+    "named": false
+  },
+  {
+    "type": "var",
     "named": false
   },
   {
@@ -2808,6 +2924,14 @@
   },
   {
     "type": "wait-for-turn",
+    "named": false
+  },
+  {
+    "type": "while",
+    "named": false
+  },
+  {
+    "type": "xor",
     "named": false
   },
   {

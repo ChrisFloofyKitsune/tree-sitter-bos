@@ -8,10 +8,16 @@ const {PREC, c_rules, commaSep1, preprocIf, commaSep, preprocessor} = require(".
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
+function laxCasing(str) {
+    return alias(new RegExp(str.replaceAll('-', '-?'), 'i'), str);
+}
+
 function kw(keyword, ...rules) {
     let argRules = rules.map(rule => {
         // if regex or string, pass through
-        if (typeof rule === 'string' || rule instanceof RegExp) {
+        if (typeof rule === 'string') {
+            return prec(2, laxCasing(rule));
+        } else if (rule instanceof RegExp) {
             return prec(2, rule);
         }
 
@@ -24,10 +30,8 @@ function kw(keyword, ...rules) {
         return field(`argument`, rule);
     });
 
-    let kw_regex = new RegExp(keyword.replaceAll('-', '-?'), 'i');
-
     return prec(PREC.CALL + 1, seq(
-        field('keyword', alias(kw_regex, keyword)),
+        field('keyword', laxCasing(keyword)),
         ...argRules,
         ';'
     ));
@@ -118,13 +122,13 @@ module.exports = grammar({
         )),
 
         piece_declaration: $ => prec(10, seq(
-            /piece/i,
+            laxCasing('piece'),
             commaSep1(field("name", $._piece_name)),
             ';'
         )),
 
         static_var_declaration: $ => prec(10, seq(
-            /static-?var/i,
+            laxCasing('static-var'),
             commaSep1(field('name', $._var_name)),
             ';'
         )),
@@ -153,22 +157,22 @@ module.exports = grammar({
         ),
 
         var_statement: $ => seq(
-            /var/i,
+            laxCasing('var'),
             commaSep1($._var_name),
             ';'
         ),
 
         if_statement: $ => prec.left(seq(
-            /if/i,
+            laxCasing('if'),
             '(',
             field("condition", $.expression),
             ')',
             field("then", $.statement),
-            optional(seq(/else/i, field("else", $.statement))),
+            optional(seq(laxCasing('else'), field("else", $.statement))),
         )),
 
         while_statement: $ => seq(
-            /while/i,
+            laxCasing('while'),
             '(',
             field("condition", $.expression),
             ')',
@@ -189,7 +193,7 @@ module.exports = grammar({
         ),
 
         return_statement: $ => seq(
-            /return/i,
+            laxCasing('return'),
             optional($.expression),
             ';'
         ),
@@ -252,34 +256,34 @@ module.exports = grammar({
         set_signal_mask_statement: $ => kw('set-signal-mask', $.expression),
         sleep_statement: $ => kw('sleep', $.expression),
 
-        set_statement: $ => kw('set', $.expression, /to/i, $.expression),
-
+        set_statement: $ => kw('set', $.expression, 'to', $.expression),
         get_statement: $ => kw('get', field('call', $.get_call)),
+
         spin_statement: $ => kw(
-            'spin', field('piece', $._piece_name), /around/i, field('axis', $.axis), /speed/i, $.expression,
-            optional(seq(/accelerate/i, $.expression))
+            'spin', field('piece', $._piece_name), 'around', field('axis', $.axis), 'speed', $.expression,
+            optional(seq('accelerate', $.expression))
         ),
 
         stop_spin_statement: $ => kw(
-            'stop-spin', field('piece', $._piece_name), /around/i, field('axis', $.axis),
-            optional(seq(/decelerate/i, $.expression))
+            'stop-spin', field('piece', $._piece_name), 'around', field('axis', $.axis),
+            optional(seq('decelerate', $.expression))
         ),
-        speed_or_now: $ => choice(/now/i, seq(/speed/i, $.expression)),
+        speed_or_now: $ => choice('now', seq('speed', $.expression)),
 
-        turn_statement: $ => kw('turn', field('piece', $._piece_name), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
-        move_statement: $ => kw('move', field('piece', $._piece_name), /to/i, field('axis', $.axis), $.expression, $.speed_or_now),
-        wait_for_turn_statement: $ => kw('wait-for-turn', field('piece', $._piece_name), /around/i, field('axis', $.axis),),
+        turn_statement: $ => kw('turn', field('piece', $._piece_name), 'to', field('axis', $.axis), $.expression, $.speed_or_now),
+        move_statement: $ => kw('move', field('piece', $._piece_name), 'to', field('axis', $.axis), $.expression, $.speed_or_now),
+        wait_for_turn_statement: $ => kw('wait-for-turn', field('piece', $._piece_name), 'around', field('axis', $.axis),),
 
-        wait_for_move_statement: $ => kw('wait-for-move', field('piece', $._piece_name), /along/i, field('axis', $.axis),),
+        wait_for_move_statement: $ => kw('wait-for-move', field('piece', $._piece_name), 'along', field('axis', $.axis),),
         hide_statement: $ => kw('hide', field('piece', $._piece_name)),
 
         show_statement: $ => kw('show', field('piece', $._piece_name)),
-        emit_sfx_statement: $ => kw('emit-sfx', $.expression, /from/i, field('piece', $._piece_name)),
+        emit_sfx_statement: $ => kw('emit-sfx', $.expression, 'from', field('piece', $._piece_name)),
 
         // play_sound_statement: $ => undefined,
-        explode_statement: $ => kw('explode', field('piece', $._piece_name), /type/i, $.expression),
+        explode_statement: $ => kw('explode', field('piece', $._piece_name), 'type', $.expression),
 
-        attach_unit_statement: $ => kw('attach-unit', $.expression, /to/i, $.expression),
+        attach_unit_statement: $ => kw('attach-unit', $.expression, 'to', $.expression),
         drop_unit_statement: $ => kw('drop-unit', $.expression),
 
         cache_statement: $ => kw('cache', field('piece', $._piece_name)),
@@ -307,10 +311,10 @@ module.exports = grammar({
 
         _macro_call_expression: $ => alias($.preproc_call_expression, $.macro_call_expression),
 
-        get_term: $ => seq(/get/i, $.get_call),
+        get_term: $ => seq(laxCasing('get'), $.get_call),
 
         unary_expression: $ => prec.left(PREC.UNARY, seq(
-            field('operator', alias(choice('!', /not/i), '!')),
+            field('operator', alias(choice('!', laxCasing('not')), '!')),
             field('argument', $.expression),
         )),
 
@@ -321,9 +325,9 @@ module.exports = grammar({
                 ['*', PREC.MULTIPLY],
                 ['/', PREC.MULTIPLY],
                 ['%', PREC.MULTIPLY],
-                [alias(choice('^^', /xor/i), '^^'), PREC.LOGICAL_XOR],
-                [alias(choice('||', /or/i), '||'), PREC.LOGICAL_OR],
-                [alias(choice('&&', /and/i), '&&'), PREC.LOGICAL_AND],
+                [alias(choice('^^', laxCasing('xor')), '^^'), PREC.LOGICAL_XOR],
+                [alias(choice('||', laxCasing('or')), '||'), PREC.LOGICAL_OR],
+                [alias(choice('&&', laxCasing('and')), '&&'), PREC.LOGICAL_AND],
                 ['^', PREC.EXCLUSIVE_OR],
                 ['|', PREC.INCLUSIVE_OR],
                 ['&', PREC.BITWISE_AND],
@@ -348,7 +352,7 @@ module.exports = grammar({
         },
 
         rand_call: $ => seq(
-            /rand/i,
+            laxCasing('rand'),
             '(',
             field('lower_bound', $.expression),
             ',',
