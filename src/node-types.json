@@ -426,18 +426,6 @@
             "named": false
           },
           {
-            "type": "and",
-            "named": false
-          },
-          {
-            "type": "or",
-            "named": false
-          },
-          {
-            "type": "xor",
-            "named": false
-          },
-          {
             "type": "|",
             "named": false
           },
@@ -2399,10 +2387,6 @@
           {
             "type": "!",
             "named": false
-          },
-          {
-            "type": "not",
-            "named": false
           }
         ]
       }
@@ -2702,10 +2686,6 @@
     "named": false
   },
   {
-    "type": "and",
-    "named": false
-  },
-  {
     "type": "arg_name",
     "named": true
   },
@@ -2807,20 +2787,12 @@
     "named": false
   },
   {
-    "type": "not",
-    "named": false
-  },
-  {
     "type": "now",
     "named": false
   },
   {
     "type": "number_literal",
     "named": true
-  },
-  {
-    "type": "or",
-    "named": false
   },
   {
     "type": "piece",
@@ -2928,10 +2900,6 @@
   },
   {
     "type": "while",
-    "named": false
-  },
-  {
-    "type": "xor",
     "named": false
   },
   {

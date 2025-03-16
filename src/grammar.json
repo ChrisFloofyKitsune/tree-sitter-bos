@@ -2321,14 +2321,9 @@
                     "value": "!"
                   },
                   {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "PATTERN",
-                      "value": "not",
-                      "flags": "i"
-                    },
-                    "named": false,
-                    "value": "not"
+                    "type": "PATTERN",
+                    "value": "not",
+                    "flags": "i"
                   }
                 ]
               },
@@ -2542,14 +2537,9 @@
                         "value": "^^"
                       },
                       {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "PATTERN",
-                          "value": "xor",
-                          "flags": "i"
-                        },
-                        "named": false,
-                        "value": "xor"
+                        "type": "PATTERN",
+                        "value": "xor",
+                        "flags": "i"
                       }
                     ]
                   },
@@ -2595,14 +2585,9 @@
                         "value": "||"
                       },
                       {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "PATTERN",
-                          "value": "or",
-                          "flags": "i"
-                        },
-                        "named": false,
-                        "value": "or"
+                        "type": "PATTERN",
+                        "value": "or",
+                        "flags": "i"
                       }
                     ]
                   },
@@ -2648,14 +2633,9 @@
                         "value": "&&"
                       },
                       {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "PATTERN",
-                          "value": "and",
-                          "flags": "i"
-                        },
-                        "named": false,
-                        "value": "and"
+                        "type": "PATTERN",
+                        "value": "and",
+                        "flags": "i"
                       }
                     ]
                   },

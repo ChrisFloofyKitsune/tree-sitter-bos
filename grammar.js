@@ -314,7 +314,7 @@ module.exports = grammar({
         get_term: $ => seq(laxCasing('get'), $.get_call),
 
         unary_expression: $ => prec.left(PREC.UNARY, seq(
-            field('operator', alias(choice('!', laxCasing('not')), '!')),
+            field('operator', alias(choice('!', /not/i), '!')),
             field('argument', $.expression),
         )),
 
@@ -325,9 +325,9 @@ module.exports = grammar({
                 ['*', PREC.MULTIPLY],
                 ['/', PREC.MULTIPLY],
                 ['%', PREC.MULTIPLY],
-                [alias(choice('^^', laxCasing('xor')), '^^'), PREC.LOGICAL_XOR],
-                [alias(choice('||', laxCasing('or')), '||'), PREC.LOGICAL_OR],
-                [alias(choice('&&', laxCasing('and')), '&&'), PREC.LOGICAL_AND],
+                [alias(choice('^^', /xor/i), '^^'), PREC.LOGICAL_XOR],
+                [alias(choice('||', /or/i), '||'), PREC.LOGICAL_OR],
+                [alias(choice('&&', /and/i), '&&'), PREC.LOGICAL_AND],
                 ['^', PREC.EXCLUSIVE_OR],
                 ['|', PREC.INCLUSIVE_OR],
                 ['&', PREC.BITWISE_AND],
