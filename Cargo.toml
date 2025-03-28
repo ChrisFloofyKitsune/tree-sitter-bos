@@ -1,9 +1,9 @@
 [package]
 name = "tree-sitter-bos"
 description = "DSL scripting language for controlling unit animations and state. For the Recoil engine."
-version = "1.0.0"
+version = "1.0.1"
 authors = ["ChrisFloofyKitsune <chrisfloofykitsune@gmail.com>"]
-license = "GPL-2.0"
+license = "GPL-3.0-or-later"
 readme = "README.md"
 keywords = ["incremental", "parsing", "tree-sitter", "bos"]
 categories = ["parser-implementations", "parsing", "text-editors"]
@@ -15,6 +15,7 @@ build = "bindings/rust/build.rs"
 include = [
   "bindings/rust/*",
   "grammar.js",
+  "c_grammar.js",
   "queries/*",
   "src/*",
   "tree-sitter.json",

@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-bos",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DSL scripting language for controlling unit animations and state. Used by the Recoil engine.",
   "repository": "https://github.com/chrisfloofykitsune/tree-sitter-bos",
   "license": "GPL-3.0-or-later",

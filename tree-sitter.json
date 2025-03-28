@@ -15,7 +15,7 @@
         }
     ],
     "metadata": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "license": "GPL-3.0-or-later",
         "description": "DSL scripting language for controlling unit animations and state. Used by the Recoil engine.",
         "authors": [

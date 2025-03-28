@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=78", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "tree-sitter-bos"
 description = "DSL scripting language for controlling unit animations and state. Used by the Recoil engine."
-version = "1.0.0"
+version = "1.0.1"
 keywords = ["incremental", "parsing", "tree-sitter", "bos"]
 classifiers = [
   "Intended Audience :: Developers",
@@ -25,5 +25,5 @@ Homepage = "https://github.com/chrisfloofykitsune/tree-sitter-bos"
 core = ["tree-sitter @ https://github.com/tree-sitter/py-tree-sitter/archive/refs/heads/0.25.zip"]
 
 [tool.cibuildwheel]
-build = "cp310-*"
+build = "cp311-*"
 build-frontend = "build"
