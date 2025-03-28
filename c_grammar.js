@@ -1,6 +1,6 @@
 /*
 
-Shamelessly copied from tree-sitter-c/grammar.js
+Shamelessly copied/adapted from tree-sitter-c/grammar.js
 https://github.com/tree-sitter/tree-sitter-c/blob/master/grammar.js
 
 The MIT License (MIT)

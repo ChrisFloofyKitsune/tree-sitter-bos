@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(tree-sitter-bos
-        VERSION "0.1.0"
+        VERSION "1.0.0"
         DESCRIPTION "DSL scripting language for controlling unit animations and state. For the Recoil engine."
         HOMEPAGE_URL "https://github.com/chrisfloofykitsune/tree-sitter-bos"
         LANGUAGES C)

@@ -1,7 +1,7 @@
 [package]
 name = "tree-sitter-bos"
 description = "DSL scripting language for controlling unit animations and state. For the Recoil engine."
-version = "0.1.0"
+version = "1.0.0"
 authors = ["ChrisFloofyKitsune <chrisfloofykitsune@gmail.com>"]
 license = "GPL-2.0"
 readme = "README.md"

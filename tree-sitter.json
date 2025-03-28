@@ -15,9 +15,9 @@
         }
     ],
     "metadata": {
-        "version": "0.1.0",
-        "license": "GPL-2.0",
-        "description": "DSL scripting language for controlling unit animations and state. For the Recoil engine.",
+        "version": "1.0.0",
+        "license": "GPL-3.0-or-later",
+        "description": "DSL scripting language for controlling unit animations and state. Used by the Recoil engine.",
         "authors": [
             {
                 "name": "ChrisFloofyKitsune",
@@ -34,7 +34,7 @@
         "node": true,
         "python": true,
         "rust": true,
-        "swift": false,
-        "zig": false
+        "swift": true,
+        "zig": true
     }
 }
